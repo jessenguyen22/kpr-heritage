@@ -228,8 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Stage 1: Scroll chậm qua hero animation (50% viewport)
         .to(window, {
           scrollTo: { y: heroAnimationEnd + 50 },
-          duration: 1, // Chậm để thấy rõ mask animation
-          ease: "power1.inOut",
+          duration: 0.3, // Chậm để thấy rõ mask animation
+          ease: "power3.out",
         })
         // Stage 2: Pause để animation settle
         .to({}, { duration: 0.3 })
