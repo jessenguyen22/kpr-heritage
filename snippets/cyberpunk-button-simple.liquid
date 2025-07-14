@@ -1,0 +1,74 @@
+{% comment %}
+  Simple Cyberpunk Button Snippet
+  
+  Usage:
+  {% render 'cyberpunk-button-simple', text: 'Shop Now', url: '/collections/all' %}
+  {% render 'cyberpunk-button-simple', text: 'Learn More', url: '/pages/about', variant: 'secondary' %}
+  
+  Parameters:
+  - text: Button text (default: 'Button')
+  - url: Button URL (default: '#')
+  - variant: 'primary' or 'secondary' (default: 'primary')
+  - size: 'small', 'large' (optional)
+  - full_width_mobile: true/false (default: false)
+  - open_new_tab: true/false (default: false)
+{% endcomment %}
+
+{%- liquid
+  assign button_text = text | default: 'Button'
+  assign button_url = url | default: '#'
+  assign button_variant = variant | default: 'primary'
+  assign button_size = size | default: ''
+  assign button_full_width = full_width_mobile | default: false
+  assign button_new_tab = open_new_tab | default: false
+  
+  assign button_class = 'button-cyberpunk'
+  if button_variant == 'secondary'
+    assign button_class = button_class | append: ' button-cyberpunk--secondary'
+  endif
+  if button_size != ''
+    assign button_class = button_class | append: ' button-cyberpunk--' | append: button_size
+  endif
+  if button_full_width
+    assign button_class = button_class | append: ' button-cyberpunk--full-width'
+  endif
+-%}
+
+{% if settings.enable_cyberpunk_buttons %}
+  <a
+    {% if button_url == blank %}
+      role="link"
+      aria-disabled="true"
+    {% else %}
+      href="{{ button_url }}"
+    {% endif %}
+    class="{{ button_class }}"
+    {% if button_new_tab %}
+      target="_blank"
+      rel="noopener noreferrer"
+    {% endif %}
+  >
+    <div class="button-cyberpunk__svg-container">
+      {% render 'cyberpunk-button-svg', position: 'top' %}
+      {% render 'cyberpunk-button-svg', position: 'bottom' %}
+    </div>
+    <span class="button-cyberpunk__text">{{ button_text }}</span>
+  </a>
+{% else %}
+  <!-- Fallback to regular button when cyberpunk is disabled -->
+  <a
+    {% if button_url == blank %}
+      role="link"
+      aria-disabled="true"
+    {% else %}
+      href="{{ button_url }}"
+    {% endif %}
+    class="button"
+    {% if button_new_tab %}
+      target="_blank"
+      rel="noopener noreferrer"
+    {% endif %}
+  >
+    {{ button_text }}
+  </a>
+{% endif %}
