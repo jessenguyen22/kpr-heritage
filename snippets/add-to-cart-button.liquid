@@ -15,6 +15,11 @@
   if product.selected_or_first_available_variant.featured_media.preview_image == blank
     assign product_variant_media = product.featured_media.preview_image | image_url: width: 100
   endif
+  
+  assign is_cyberpunk_cart = false
+  if settings.enable_cyberpunk_buttons and class contains 'button-cyberpunk'
+    assign is_cyberpunk_cart = true
+  endif
 -%}
 
 <add-to-cart-component
@@ -31,9 +36,28 @@
     {% unless can_add_to_cart %}
       disabled
     {% endunless %}
+    {%- if is_cyberpunk_cart -%}
+      style="
+        {%- if settings.cyberpunk_button_color -%}
+          --cyberpunk-button-color: {{ settings.cyberpunk_button_color }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_glow_intensity -%}
+          --cyberpunk-glow-intensity: {{ settings.cyberpunk_glow_intensity }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_animation_duration -%}
+          --cyberpunk-animation-duration: {{ settings.cyberpunk_animation_duration }}ms;
+        {%- endif -%}
+      "
+    {%- endif -%}
   >
+    {%- if is_cyberpunk_cart -%}
+      <div class="button-cyberpunk__svg-container">
+        {% render 'cyberpunk-button-svg', position: 'top' %}
+        {% render 'cyberpunk-button-svg', position: 'bottom' %}
+      </div>
+    {%- endif -%}
     <span
-      class="add-to-cart-text"
+      class="add-to-cart-text{% if is_cyberpunk_cart %} button-cyberpunk__text{% endif %}"
     >
       {% if can_add_to_cart %}
         <span class="svg-wrapper add-to-cart-icon">
@@ -46,7 +70,7 @@
     </span>
     <span
       aria-hidden="true"
-      class="add-to-cart-text--added"
+      class="add-to-cart-text--added{% if is_cyberpunk_cart %} button-cyberpunk__text{% endif %}"
     >
       <span class="svg-wrapper add-to-cart-icon--added">
         {{- 'icon-checkmark.svg' | inline_asset_content -}}

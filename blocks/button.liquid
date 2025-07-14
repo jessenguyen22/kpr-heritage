@@ -37,11 +37,47 @@
           "label": "t:options.secondary"
         },
         {
+          "value": "button-cyberpunk",
+          "label": "Cyberpunk Electric (Primary)"
+        },
+        {
+          "value": "button-cyberpunk button-cyberpunk--secondary",
+          "label": "Cyberpunk Electric (Secondary)"
+        },
+        {
           "value": "link",
           "label": "t:options.link"
         }
       ],
       "default": "button"
+    },
+    {
+      "type": "select",
+      "id": "cyberpunk_size",
+      "label": "Cyberpunk Button Size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "",
+          "label": "Default"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "",
+      "visible_if": "{{ block.settings.style_class == 'button-cyberpunk' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width_mobile",
+      "label": "Full width on mobile",
+      "default": false,
+      "visible_if": "{{ block.settings.style_class == 'button-cyberpunk' }}"
     },
     {
       "type": "header",

@@ -1,0 +1,90 @@
+{% comment %}
+  Cyberpunk Button Dynamic Styles
+  Generates CSS for dynamic glow colors based on theme settings
+{% endcomment %}
+
+{% if settings.enable_cyberpunk_buttons %}
+  {%- liquid
+    assign primary_glow_color = settings.cyberpunk_primary_glow_color | default: '#00d4ff'
+    assign primary_glow_rgb = primary_glow_color | color_to_rgb | remove: 'rgb(' | remove: ')' | split: ', '
+    assign primary_glow_r = primary_glow_rgb[0]
+    assign primary_glow_g = primary_glow_rgb[1] 
+    assign primary_glow_b = primary_glow_rgb[2]
+    
+    assign secondary_glow_color = settings.cyberpunk_secondary_glow_color | default: '#ffffff'
+    assign secondary_glow_rgb = secondary_glow_color | color_to_rgb | remove: 'rgb(' | remove: ')' | split: ', '
+    assign secondary_glow_r = secondary_glow_rgb[0]
+    assign secondary_glow_g = secondary_glow_rgb[1]
+    assign secondary_glow_b = secondary_glow_rgb[2]
+  -%}
+
+  <style>
+    /* Dynamic Primary Glow Animation */
+    @keyframes cyberpunk-primary-pulse {
+      0%, 100% { 
+        filter: drop-shadow(0 0 3px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.4)));
+      }
+      15% { 
+        filter: drop-shadow(0 0 8px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.6))) 
+                drop-shadow(0 0 12px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.3)));
+      }
+      30% { 
+        filter: drop-shadow(0 0 12px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.8))) 
+                drop-shadow(0 0 16px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.4)));
+      }
+      45% { 
+        filter: drop-shadow(0 0 6px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.5)));
+      }
+      60% { 
+        filter: drop-shadow(0 0 10px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.7))) 
+                drop-shadow(0 0 14px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.3)));
+      }
+      75% { 
+        filter: drop-shadow(0 0 4px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.4)));
+      }
+      90% { 
+        filter: drop-shadow(0 0 7px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, calc(var(--cyberpunk-primary-glow-intensity, 0.6) * 0.6)));
+      }
+    }
+
+    /* Primary Active state */
+    .button-cyberpunk:not([class*="button-cyberpunk--secondary"]):active {
+      transform: scale(0.95);
+      filter: drop-shadow(0 0 15px rgba({{ primary_glow_r }}, {{ primary_glow_g }}, {{ primary_glow_b }}, 1)) !important;
+    }
+
+    /* Dynamic Secondary Glow Animation */
+    @keyframes cyberpunk-secondary-pulse {
+      0%, 100% { 
+        filter: drop-shadow(0 0 3px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.4)));
+      }
+      15% { 
+        filter: drop-shadow(0 0 8px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.6))) 
+                drop-shadow(0 0 12px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.3)));
+      }
+      30% { 
+        filter: drop-shadow(0 0 12px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.8))) 
+                drop-shadow(0 0 16px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.4)));
+      }
+      45% { 
+        filter: drop-shadow(0 0 6px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.5)));
+      }
+      60% { 
+        filter: drop-shadow(0 0 10px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.7))) 
+                drop-shadow(0 0 14px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.3)));
+      }
+      75% { 
+        filter: drop-shadow(0 0 4px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.4)));
+      }
+      90% { 
+        filter: drop-shadow(0 0 7px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, calc(var(--cyberpunk-secondary-glow-intensity, 0.4) * 0.6)));
+      }
+    }
+
+    /* Secondary Active state */
+    .button-cyberpunk[class*="button-cyberpunk--secondary"]:active {
+      transform: scale(0.95);
+      filter: drop-shadow(0 0 15px rgba({{ secondary_glow_r }}, {{ secondary_glow_g }}, {{ secondary_glow_b }}, 0.8)) !important;
+    }
+  </style>
+{% endif %}

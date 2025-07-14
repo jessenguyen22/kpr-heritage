@@ -1,3 +1,9 @@
 {{ 'base.css' | asset_url | preload_tag: as: 'style' }}
 {{ 'overflow-list.css' | asset_url | preload_tag: as: 'style' }}
+{% if settings.enable_cyberpunk_buttons %}
+  {{ 'component-button-cyberpunk.css' | asset_url | preload_tag: as: 'style' }}
+{% endif %}
 {{ 'base.css' | asset_url | stylesheet_tag }}
+{% if settings.enable_cyberpunk_buttons %}
+  {{ 'component-button-cyberpunk.css' | asset_url | stylesheet_tag }}
+{% endif %}

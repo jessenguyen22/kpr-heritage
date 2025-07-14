@@ -1,0 +1,30 @@
+{%- doc -%}
+  Renders SVG shapes for cyberpunk button geometric design.
+  
+  @param {string} position - Either 'top' or 'bottom' to determine which SVG to render
+  @param {string} [class] - Additional CSS classes to apply
+{%- enddoc -%}
+
+{%- if position == 'top' -%}
+  <svg 
+    class="button-cyberpunk__svg-top {{ class }}" 
+    height="50" 
+    viewBox="0 0 164 50"
+    aria-hidden="true"
+  >
+    <path 
+      d="M0 47V12.9246C0 12.0421 0.388638 11.2043 1.06246 10.6342L12.7946 0.709596C13.3362 0.251413 14.0227 0 14.7321 0H161C162.657 0 164 1.34315 164 3V47C164 48.6569 162.657 50 161 50H3C1.34315 50 0 48.6569 0 47Z"
+    />
+  </svg>
+{%- elsif position == 'bottom' -%}
+  <svg 
+    class="button-cyberpunk__svg-bottom {{ class }}" 
+    height="54" 
+    viewBox="0 0 180 54"
+    aria-hidden="true"
+  >
+    <path 
+      d="M147.395 50L3.00012 50C1.34327 50 0.000124359 48.6569 0.000120125 47L7.66757e-06 3.00001C3.43289e-06 1.34315 1.34314 0 3 0H175C176.657 0 178 1.34315 178 3V10.3266C178 11.14 178.33 11.9184 178.915 12.4837L179.085 12.648C179.67 13.2132 180 13.9917 180 14.805V51C180 52.6569 178.657 54 177 54H153.182C152.121 54 151.139 53.4394 150.599 52.5257L149.978 51.4743C149.438 50.5606 148.456 50 147.395 50Z"
+    />
+  </svg>
+{%- endif -%}

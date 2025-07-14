@@ -8,27 +8,102 @@
   {% render 'button', link: '/collections/all' %}
 {%- enddoc -%}
 
-<a
-  {% if link == blank %}
-    role="link"
-    aria-disabled="true"
-  {% else %}
-    href="{{ link }}"
-  {% endif %}
-  class="
-    size-style
-    {{ block.settings.style_class }}
-    {{ block.settings.style_class }}--{{ block.id }}
-  "
-  style="{% render 'size-style', settings: block.settings %}"
-  {%- if block.settings.open_in_new_tab -%}
-    target="_blank"
-    rel="noopener noreferrer"
-  {%- endif -%}
-  {{ block.shopify_attributes }}
->
-  {{ block.settings.label }}
-</a>
+{%- liquid
+  assign is_cyberpunk = false
+  assign is_cyberpunk_secondary = false
+  if settings.enable_cyberpunk_buttons and block.settings.style_class contains 'button-cyberpunk'
+    assign is_cyberpunk = true
+    if block.settings.style_class contains 'button-cyberpunk--secondary'
+      assign is_cyberpunk_secondary = true
+    endif
+  endif
+-%}
+
+{%- if is_cyberpunk -%}
+  <a
+    {% if link == blank %}
+      role="link"
+      aria-disabled="true"
+    {% else %}
+      href="{{ link }}"
+    {% endif %}
+    class="
+      size-style
+      button-cyberpunk
+      {{ block.settings.style_class }}--{{ block.id }}
+      {%- if block.settings.cyberpunk_size %} button-cyberpunk--{{ block.settings.cyberpunk_size }}{% endif -%}
+      {%- if block.settings.full_width_mobile %} button-cyberpunk--full-width{% endif -%}
+    "
+    style="
+      {% render 'size-style', settings: block.settings %}
+      {%- if is_cyberpunk_secondary -%}
+        {%- if settings.cyberpunk_secondary_button_color -%}
+          --cyberpunk-secondary-button-color: {{ settings.cyberpunk_secondary_button_color }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_secondary_background_color -%}
+          --cyberpunk-secondary-background-color: {{ settings.cyberpunk_secondary_background_color }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_secondary_glow_color -%}
+          --cyberpunk-secondary-glow-color: {{ settings.cyberpunk_secondary_glow_color }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_secondary_glow_intensity -%}
+          --cyberpunk-secondary-glow-intensity: {{ settings.cyberpunk_secondary_glow_intensity }};
+        {%- endif -%}
+      {%- else -%}
+        {%- if settings.cyberpunk_primary_button_color -%}
+          --cyberpunk-primary-button-color: {{ settings.cyberpunk_primary_button_color }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_primary_background_color -%}
+          --cyberpunk-primary-background-color: {{ settings.cyberpunk_primary_background_color }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_primary_glow_color -%}
+          --cyberpunk-primary-glow-color: {{ settings.cyberpunk_primary_glow_color }};
+        {%- endif -%}
+        {%- if settings.cyberpunk_primary_glow_intensity -%}
+          --cyberpunk-primary-glow-intensity: {{ settings.cyberpunk_primary_glow_intensity }};
+        {%- endif -%}
+      {%- endif -%}
+      {%- if settings.cyberpunk_animation_duration -%}
+        --cyberpunk-animation-duration: {{ settings.cyberpunk_animation_duration }}ms;
+      {%- endif -%}
+    "
+    {%- if block.settings.open_in_new_tab -%}
+      target="_blank"
+      rel="noopener noreferrer"
+    {%- endif -%}
+    {{ block.shopify_attributes }}
+  >
+    <div class="button-cyberpunk__svg-container">
+      {% render 'cyberpunk-button-svg', position: 'top' %}
+      {% render 'cyberpunk-button-svg', position: 'bottom' %}
+    </div>
+    <span class="button-cyberpunk__text">
+      {{ block.settings.label }}
+    </span>
+  </a>
+{%- else -%}
+  <a
+    {% if link == blank %}
+      role="link"
+      aria-disabled="true"
+    {% else %}
+      href="{{ link }}"
+    {% endif %}
+    class="
+      size-style
+      {{ block.settings.style_class }}
+      {{ block.settings.style_class }}--{{ block.id }}
+    "
+    style="{% render 'size-style', settings: block.settings %}"
+    {%- if block.settings.open_in_new_tab -%}
+      target="_blank"
+      rel="noopener noreferrer"
+    {%- endif -%}
+    {{ block.shopify_attributes }}
+  >
+    {{ block.settings.label }}
+  </a>
+{%- endif -%}
 
 {% stylesheet %}
   .link {

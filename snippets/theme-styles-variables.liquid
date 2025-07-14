@@ -534,5 +534,26 @@
     --cart-secondary-font-family: var(--font-{{ settings.cart_price_font }}--family);
     --cart-secondary-font-style: var(--font-{{ settings.cart_price_font }}--style);
     --cart-secondary-font-weight: var(--font-{{ settings.cart_price_font }}--weight);
+
+    {% if settings.enable_cyberpunk_buttons %}
+    /* Cyberpunk Buttons */
+    --cyberpunk-primary-button-color: {{ settings.cyberpunk_primary_button_color | default: '#00d4ff' }};
+    --cyberpunk-primary-background-color: {{ settings.cyberpunk_primary_background_color | default: '#00d4ff' }};
+    --cyberpunk-primary-glow-color: {{ settings.cyberpunk_primary_glow_color | default: '#00d4ff' }};
+    --cyberpunk-primary-glow-intensity: {{ settings.cyberpunk_primary_glow_intensity | default: 0.6 }};
+    --cyberpunk-primary-font-family: var(--font-{{ settings.cyberpunk_primary_font | default: 'accent' }}--family);
+    --cyberpunk-primary-font-weight: {% if settings.cyberpunk_primary_font_weight == 'default' %}var(--font-{{ settings.cyberpunk_primary_font | default: 'accent' }}--weight){% else %}{{ settings.cyberpunk_primary_font_weight | default: '400' }}{% endif %};
+    --cyberpunk-primary-text-case: {% if settings.cyberpunk_primary_text_case == 'default' %}none{% else %}{{ settings.cyberpunk_primary_text_case | default: 'uppercase' }}{% endif %};
+    
+    --cyberpunk-secondary-button-color: {{ settings.cyberpunk_secondary_button_color | default: '#ffffff' }};
+    --cyberpunk-secondary-background-color: {{ settings.cyberpunk_secondary_background_color | default: '#1a1a1a' }};
+    --cyberpunk-secondary-glow-color: {{ settings.cyberpunk_secondary_glow_color | default: '#ffffff' }};
+    --cyberpunk-secondary-glow-intensity: {{ settings.cyberpunk_secondary_glow_intensity | default: 0.4 }};
+    --cyberpunk-secondary-font-family: var(--font-{{ settings.cyberpunk_secondary_font | default: 'body' }}--family);
+    --cyberpunk-secondary-font-weight: {% if settings.cyberpunk_secondary_font_weight == 'default' %}var(--font-{{ settings.cyberpunk_secondary_font | default: 'body' }}--weight){% else %}{{ settings.cyberpunk_secondary_font_weight | default: '500' }}{% endif %};
+    --cyberpunk-secondary-text-case: {% if settings.cyberpunk_secondary_text_case == 'default' %}none{% else %}{{ settings.cyberpunk_secondary_text_case | default: 'none' }}{% endif %};
+    
+    --cyberpunk-animation-duration: {{ settings.cyberpunk_animation_duration | default: 800 }}ms;
+    {% endif %}
   }
 {% endstyle %}

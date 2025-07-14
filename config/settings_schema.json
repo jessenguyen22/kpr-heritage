@@ -1707,6 +1707,286 @@
         "step": 1,
         "unit": "px",
         "default": 40
+      },
+      {
+        "type": "header",
+        "content": "Cyberpunk Electric Buttons"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_cyberpunk_buttons",
+        "label": "Enable Cyberpunk Button Style",
+        "default": false,
+        "info": "Enables the cyberpunk electric pulse button style option throughout the theme"
+      },
+      {
+        "type": "header",
+        "content": "Primary Cyberpunk Button",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "color",
+        "id": "cyberpunk_primary_button_color",
+        "label": "Button Text Color",
+        "default": "#00d4ff",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "color",
+        "id": "cyberpunk_primary_background_color",
+        "label": "Button Background Color",
+        "default": "#00d4ff",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "color",
+        "id": "cyberpunk_primary_glow_color",
+        "label": "Glow Effect Color",
+        "default": "#00d4ff",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "range",
+        "id": "cyberpunk_primary_glow_intensity",
+        "label": "Glow Intensity",
+        "min": 0.2,
+        "max": 1.0,
+        "step": 0.1,
+        "default": 0.6,
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "select",
+        "id": "cyberpunk_primary_font",
+        "label": "Font Family",
+        "options": [
+          {
+            "value": "body",
+            "label": "Body"
+          },
+          {
+            "value": "subheading",
+            "label": "Subheading"
+          },
+          {
+            "value": "heading",
+            "label": "Heading"
+          },
+          {
+            "value": "accent",
+            "label": "Accent"
+          }
+        ],
+        "default": "accent",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "select",
+        "id": "cyberpunk_primary_font_weight",
+        "label": "Font Weight",
+        "options": [
+          {
+            "value": "default",
+            "label": "Default"
+          },
+          {
+            "value": "100",
+            "label": "Thin"
+          },
+          {
+            "value": "300",
+            "label": "Light"
+          },
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          },
+          {
+            "value": "900",
+            "label": "Black"
+          }
+        ],
+        "default": "400",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "select",
+        "id": "cyberpunk_primary_text_case",
+        "label": "Text Case",
+        "options": [
+          {
+            "value": "default",
+            "label": "Default"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          },
+          {
+            "value": "lowercase",
+            "label": "Lowercase"
+          },
+          {
+            "value": "capitalize",
+            "label": "Capitalize"
+          }
+        ],
+        "default": "uppercase",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "header",
+        "content": "Secondary Cyberpunk Button",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "color",
+        "id": "cyberpunk_secondary_button_color",
+        "label": "Button Text Color",
+        "default": "#ffffff",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "color",
+        "id": "cyberpunk_secondary_background_color",
+        "label": "Button Background Color",
+        "default": "#1a1a1a",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "color",
+        "id": "cyberpunk_secondary_glow_color",
+        "label": "Glow Effect Color",
+        "default": "#ffffff",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "range",
+        "id": "cyberpunk_secondary_glow_intensity",
+        "label": "Glow Intensity",
+        "min": 0.2,
+        "max": 1.0,
+        "step": 0.1,
+        "default": 0.4,
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "select",
+        "id": "cyberpunk_secondary_font",
+        "label": "Font Family",
+        "options": [
+          {
+            "value": "body",
+            "label": "Body"
+          },
+          {
+            "value": "subheading",
+            "label": "Subheading"
+          },
+          {
+            "value": "heading",
+            "label": "Heading"
+          },
+          {
+            "value": "accent",
+            "label": "Accent"
+          }
+        ],
+        "default": "body",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "select",
+        "id": "cyberpunk_secondary_font_weight",
+        "label": "Font Weight",
+        "options": [
+          {
+            "value": "default",
+            "label": "Default"
+          },
+          {
+            "value": "100",
+            "label": "Thin"
+          },
+          {
+            "value": "300",
+            "label": "Light"
+          },
+          {
+            "value": "400",
+            "label": "Regular"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semibold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          },
+          {
+            "value": "900",
+            "label": "Black"
+          }
+        ],
+        "default": "500",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "select",
+        "id": "cyberpunk_secondary_text_case",
+        "label": "Text Case",
+        "options": [
+          {
+            "value": "default",
+            "label": "Default"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          },
+          {
+            "value": "lowercase",
+            "label": "Lowercase"
+          },
+          {
+            "value": "capitalize",
+            "label": "Capitalize"
+          }
+        ],
+        "default": "default",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "header",
+        "content": "Animation Settings",
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
+      },
+      {
+        "type": "range",
+        "id": "cyberpunk_animation_duration",
+        "label": "Animation Duration (ms)",
+        "min": 300,
+        "max": 1200,
+        "step": 100,
+        "default": 800,
+        "visible_if": "{{ settings.enable_cyberpunk_buttons == true }}"
       }
     ]
   },
