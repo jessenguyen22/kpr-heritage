@@ -505,12 +505,31 @@ window.addEventListener("load", () => {
 
 
 // ===========================================
-// 9. STICKY PRODUCT SCROLL FOR TRADITIONAL SECTION
-// Compatible với existing hero scroll logic
+// 9. ENHANCED STICKY PRODUCT SCROLL FOR TRADITIONAL SECTION
+// With customizable start position and floating products effect
 // ===========================================
 
 let traditionalStickyInitialized = false;
 let traditionalScrollTrigger = null;
+
+// ⚙️ CONFIGURATION - Customize these values
+const TRADITIONAL_CONFIG = {
+  // Điều chỉnh vị trí bắt đầu sticky (0-1, 0 = top, 1 = bottom)
+  stickyStartOffset: 0.2, // Section sẽ sticky khi 20% section visible
+  
+  // Điều chỉnh tốc độ scroll
+  scrollMultiplier: 2.5,
+  
+  // Float effect settings
+  enableFloatEffect: true,
+  floatDistance: -200, // Negative = bay lên trên
+  floatOpacity: 0.3,
+  floatScale: 0.8,
+  
+  // Animation settings
+  scrubSmoothness: 1.5,
+  anticipatePin: 1,
+};
 
 window.addEventListener("load", () => {
   // Monitor scroll position để không conflict với hero scroll
@@ -522,17 +541,15 @@ function monitorHeroScrollCompletion() {
                      document.querySelector(".hero-section");
   
   if (!heroSection) {
-    // Nếu không có hero section, init luôn
     setTimeout(() => initTraditionalStickyScroll(), 100);
     return;
   }
   
   const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5; // 50% như trong code gốc
+  const heroAnimationEnd = viewportHeight * 0.5;
   
   console.log('🎯 Monitoring hero completion at:', heroAnimationEnd);
   
-  // Create a lightweight ScrollTrigger để monitor hero completion
   ScrollTrigger.create({
     trigger: "body",
     start: 0,
@@ -540,18 +557,14 @@ function monitorHeroScrollCompletion() {
     onUpdate: (self) => {
       const currentScroll = window.pageYOffset;
       
-      // Chỉ init sticky scroll khi user đã scroll qua hero animation
       if (currentScroll > heroAnimationEnd + 100 && !traditionalStickyInitialized) {
         console.log('✅ Hero scroll completed, initializing traditional sticky...');
         traditionalStickyInitialized = true;
-        
-        // Delay nhỏ để đảm bảo không conflict
         setTimeout(() => {
           initTraditionalStickyScroll();
         }, 200);
       }
       
-      // Disable sticky nếu user scroll back lên hero
       if (currentScroll < heroAnimationEnd && traditionalStickyInitialized && traditionalScrollTrigger) {
         console.log('🔄 User scrolled back to hero, disabling sticky temporarily');
         disableTraditionalSticky();
@@ -561,7 +574,6 @@ function monitorHeroScrollCompletion() {
 }
 
 function initTraditionalStickyScroll() {
-  // Kiểm tra xem user có đang trong quá trình hero scroll không
   const viewportHeight = window.innerHeight;
   const heroAnimationEnd = viewportHeight * 0.5;
   const currentScroll = window.pageYOffset;
@@ -576,7 +588,6 @@ function initTraditionalStickyScroll() {
   const productWrapper = traditionalSection?.querySelector('.kpr-product-wrapper');
   const productCards = traditionalSection?.querySelectorAll('.kpr-product-card');
   
-  // Validation
   if (!traditionalSection || !productWrapper || !productCards.length) {
     console.log('🔍 Traditional sticky: Required elements not found');
     return;
@@ -591,45 +602,74 @@ function initTraditionalStickyScroll() {
       return total + card.offsetHeight + 30;
     }, 0);
     
-    return Math.max(totalCardsHeight - viewportHeight + 300, 500);
+    return Math.max(totalCardsHeight - viewportHeight + 400, 600);
   };
   
-  // Set performance styles
+  // 🎨 Setup container for floating effect
   gsap.set(productWrapper, {
     position: 'relative',
-    overflow: 'hidden'
+    overflow: TRADITIONAL_CONFIG.enableFloatEffect ? 'visible' : 'hidden', // Allow overflow for float effect
   });
   
   gsap.set(productCards, {
-    willChange: 'transform'
+    willChange: 'transform',
+    transformOrigin: 'center center',
   });
   
-  // Create sticky timeline
+  // 🚀 Create enhanced timeline with floating effect
   const traditionalTl = gsap.timeline();
   
+  // Main scroll animation
   traditionalTl.to(productCards, {
     y: () => -calculateScrollDistance(),
     duration: 1,
     ease: 'none',
   });
   
-  // Create ScrollTrigger với logic tránh conflict
+  // 🌟 Float effect - products bay lên trên khi scroll qua
+  if (TRADITIONAL_CONFIG.enableFloatEffect) {
+    productCards.forEach((card, index) => {
+      // Create individual float timeline for each card
+      ScrollTrigger.create({
+        trigger: card,
+        start: 'bottom center', // Khi card scroll qua center
+        end: 'bottom top-=100',
+        scrub: 1,
+        onUpdate: (self) => {
+          // Calculate float progress (0 to 1)
+          const progress = self.progress;
+          
+          // Apply floating effect
+          gsap.to(card, {
+            y: `+=${TRADITIONAL_CONFIG.floatDistance * progress}`,
+            opacity: 1 - (progress * (1 - TRADITIONAL_CONFIG.floatOpacity)),
+            scale: 1 - (progress * (1 - TRADITIONAL_CONFIG.floatScale)),
+            duration: 0.1,
+            ease: 'none',
+          });
+        },
+        id: `traditional-float-${index}`,
+      });
+    });
+  }
+  
+  // 📌 Create main sticky ScrollTrigger with custom start position
   traditionalScrollTrigger = ScrollTrigger.create({
     id: 'traditional-sticky',
     trigger: traditionalSection,
-    start: 'top top',
+    start: `top+=${TRADITIONAL_CONFIG.stickyStartOffset * 100}% top`, // Customizable start
     end: () => {
       const scrollDistance = calculateScrollDistance();
-      return `+=${scrollDistance * 2}`;
+      return `+=${scrollDistance * TRADITIONAL_CONFIG.scrollMultiplier}`;
     },
     pin: true,
     pinSpacing: true,
-    scrub: 1.5,
-    anticipatePin: 1,
+    scrub: TRADITIONAL_CONFIG.scrubSmoothness,
+    anticipatePin: TRADITIONAL_CONFIG.anticipatePin,
     animation: traditionalTl,
     
     onEnter: () => {
-      console.log('🔒 Traditional section pinned');
+      console.log('🔒 Traditional section pinned at custom offset:', TRADITIONAL_CONFIG.stickyStartOffset);
     },
     
     onLeave: () => {
@@ -641,7 +681,6 @@ function initTraditionalStickyScroll() {
       updateTraditionalProgress(progress);
     },
     
-    // Thấp priority để không conflict với smooth scroll
     refreshPriority: -2,
   });
   
@@ -652,7 +691,13 @@ function initTraditionalStickyScroll() {
     resizeTimeout = setTimeout(() => {
       if (traditionalScrollTrigger) {
         traditionalScrollTrigger.refresh();
-        console.log('🔄 Traditional sticky refreshed');
+        // Refresh float triggers
+        if (TRADITIONAL_CONFIG.enableFloatEffect) {
+          productCards.forEach((card, index) => {
+            ScrollTrigger.getById(`traditional-float-${index}`)?.refresh();
+          });
+        }
+        console.log('🔄 Traditional sticky and float effects refreshed');
       }
     }, 150);
   });
@@ -662,38 +707,41 @@ function disableTraditionalSticky() {
   if (traditionalScrollTrigger) {
     traditionalScrollTrigger.kill();
     traditionalScrollTrigger = null;
-    console.log('❌ Traditional sticky disabled');
+    
+    // Kill float effects
+    const productCards = document.querySelectorAll('#traditional-section .kpr-product-card');
+    productCards.forEach((card, index) => {
+      ScrollTrigger.getById(`traditional-float-${index}`)?.kill();
+    });
+    
+    console.log('❌ Traditional sticky and float effects disabled');
   }
   traditionalStickyInitialized = false;
 }
 
-// Override existing scrollToSection để compatible
-// Backup original function nếu có
+// Override existing scrollToSection
 const originalScrollToSection = window.scrollToSection;
 
 window.scrollToSection = function(targetId) {
   console.log('📍 Scrolling to section:', targetId);
   
-  // Temporarily disable sticky scroll during navigation
   if (traditionalScrollTrigger && targetId === 'traditional-section') {
     console.log('⏸️ Temporarily disabling sticky for smooth navigation');
     disableTraditionalSticky();
     
-    // Re-enable after scroll completion
     setTimeout(() => {
       if (window.pageYOffset > window.innerHeight * 0.5) {
-        traditionalStickyInitialized = false; // Reset flag
+        traditionalStickyInitialized = false;
         setTimeout(() => initTraditionalStickyScroll(), 500);
       }
-    }, 3000); // Wait for scroll animation to complete
+    }, 3000);
   }
   
-  // Call original function nếu có
   if (originalScrollToSection) {
     return originalScrollToSection(targetId);
   }
   
-  // Fallback sử dụng logic gốc của bạn
+  // Fallback logic (same as before)
   const targetElement = document.getElementById(targetId);
   if (!targetElement) {
     console.warn("Target element not found:", targetId);
@@ -706,8 +754,6 @@ window.scrollToSection = function(targetId) {
                      document.querySelector(".hero-section");
   const viewportHeight = window.innerHeight;
   const heroAnimationEnd = viewportHeight * 0.5;
-
-  console.log("Scrolling from:", currentScroll, "to:", targetScroll);
 
   const targetElements = targetElement.querySelectorAll(
     "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
@@ -811,8 +857,26 @@ window.addEventListener("load", () => {
 });
 
 // ===========================================
-// 10. UTILITY FUNCTIONS
+// 10. CONFIGURATION & UTILITY FUNCTIONS
 // ===========================================
+
+// 🛠️ Update configuration at runtime
+window.updateTraditionalConfig = function(newConfig) {
+  Object.assign(TRADITIONAL_CONFIG, newConfig);
+  console.log('📝 Traditional config updated:', TRADITIONAL_CONFIG);
+  
+  // Refresh if already initialized
+  if (traditionalScrollTrigger) {
+    window.resetTraditionalScroll();
+  }
+};
+
+// Example usage:
+// window.updateTraditionalConfig({
+//   stickyStartOffset: 0.5, // Start sticky when 50% of section is visible
+//   floatDistance: -300,    // Float further up
+//   floatOpacity: 0.1       // More transparent when floating
+// });
 
 window.refreshTraditionalScroll = function() {
   if (traditionalScrollTrigger) {
@@ -833,3 +897,13 @@ window.resetTraditionalScroll = function() {
   }, 100);
 };
 
+// 🎛️ Live configuration panel (for testing)
+window.showTraditionalConfig = function() {
+  console.log('🎛️ Traditional Scroll Configuration:');
+  console.log('stickyStartOffset:', TRADITIONAL_CONFIG.stickyStartOffset, '(0-1, 0=top, 1=bottom)');
+  console.log('scrollMultiplier:', TRADITIONAL_CONFIG.scrollMultiplier, '(higher = slower scroll)');
+  console.log('enableFloatEffect:', TRADITIONAL_CONFIG.enableFloatEffect);
+  console.log('floatDistance:', TRADITIONAL_CONFIG.floatDistance, '(negative = up, positive = down)');
+  console.log('floatOpacity:', TRADITIONAL_CONFIG.floatOpacity, '(0-1)');
+  console.log('floatScale:', TRADITIONAL_CONFIG.floatScale, '(0-1)');
+};
