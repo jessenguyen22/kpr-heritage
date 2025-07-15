@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => loadTl.play(), 1000);
   }
 
- // 2. ENHANCED HERO SECTION MASK ANIMATION
+// 2. ENHANCED HERO SECTION MASK ANIMATION
 const heroTl = gsap.timeline({
   scrollTrigger: {
     trigger: ".hero-section",
@@ -131,9 +131,21 @@ if (!whiteOverlay) {
     height: 100%;
     background: rgba(255, 255, 255, 0);
     pointer-events: none;
-    z-index: 2;
+    z-index: 999;
   `;
-  document.querySelector('.hero-section').appendChild(whiteOverlay);
+  
+  // Try multiple selectors to find hero section
+  const heroSection = document.querySelector('.hero-section') || 
+                     document.querySelector('[class*="hero"]') ||
+                     document.querySelector('.mask-wrapper').parentElement;
+  
+  if (heroSection) {
+    heroSection.style.position = 'relative'; // Ensure positioning context
+    heroSection.appendChild(whiteOverlay);
+    console.log('✅ White overlay created and added to:', heroSection.className);
+  } else {
+    console.log('❌ Hero section not found');
+  }
 }
 
 // Enhanced timeline with multiple effects
@@ -174,6 +186,8 @@ heroTl
     duration: 1,
     ease: "power2.inOut",
   }, 0.3); // Start sau một chút
+
+  
   // 3. CUSTOM GIF CURSOR
   const gifCursor = document.createElement("div");
   gifCursor.innerHTML = `<img src="https://cdn.shopify.com/s/files/1/0580/6994/2352/files/button5_blue_1.gif?v=1752294330">`;
