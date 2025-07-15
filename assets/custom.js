@@ -533,7 +533,7 @@ function initTraditionalSticky() {
   // Pin section and scroll products
   ScrollTrigger.create({
     trigger: section,
-    start: 'top top',
+    start: 'top+=20% top',
     end: `+=${scrollDistance}`,
     pin: true,
     scrub: 1,
