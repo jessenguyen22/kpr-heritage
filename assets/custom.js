@@ -131,20 +131,24 @@ if (!whiteOverlay) {
     height: 100%;
     background: rgba(255, 255, 255, 0);
     pointer-events: none;
-    z-index: 999;
+    z-index: 0;
   `;
   
-  // Try multiple selectors to find hero section
-  const heroSection = document.querySelector('.hero-section') || 
-                     document.querySelector('[class*="hero"]') ||
-                     document.querySelector('.mask-wrapper').parentElement;
+  // Find hero section with mask-wrapper class
+  const heroSection = document.querySelector('.hero-section.mask-wrapper');
   
   if (heroSection) {
-    heroSection.style.position = 'relative'; // Ensure positioning context
-    heroSection.appendChild(whiteOverlay);
-    console.log('✅ White overlay created and added to:', heroSection.className);
+    heroSection.style.position = 'relative';
+    // Insert overlay before the first content (after video)
+    const firstContentElement = heroSection.querySelector('.xb-container');
+    if (firstContentElement) {
+      heroSection.insertBefore(whiteOverlay, firstContentElement);
+    } else {
+      heroSection.appendChild(whiteOverlay);
+    }
+    console.log('✅ White overlay created and positioned above video');
   } else {
-    console.log('❌ Hero section not found');
+    console.log('❌ Hero section with mask-wrapper not found');
   }
 }
 
@@ -186,8 +190,6 @@ heroTl
     duration: 1,
     ease: "power2.inOut",
   }, 0.3); // Start sau một chút
-
-  
   // 3. CUSTOM GIF CURSOR
   const gifCursor = document.createElement("div");
   gifCursor.innerHTML = `<img src="https://cdn.shopify.com/s/files/1/0580/6994/2352/files/button5_blue_1.gif?v=1752294330">`;
