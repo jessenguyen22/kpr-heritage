@@ -1,6 +1,14 @@
-document.addEventListener("DOMContentLoaded", function () {
-  let allowHover = true;
+// ===========================================
+// GSAP SYSTEM - REORGANIZED FOR COMPATIBILITY
+// ===========================================
 
+// Global variables
+let allowHover = true;
+let traditionalStickyTrigger = null;
+let gifCursor = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+  
   // 1. LOAD PAGE ANIMATIONS
   const loadTl = gsap.timeline({ paused: true });
 
@@ -13,85 +21,36 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   loadTl
-    .to(
-      ".traditional-img",
-      {
-        scale: 1,
-        x: 0,
-        opacity: 1,
-        duration: 0.8,
-        ease: "power2.out",
-      },
-      1.2
-    )
-    .to(
-      ".modern-img",
-      {
-        scale: 1,
-        x: 0,
-        opacity: 1,
-        duration: 0.8,
-        ease: "power2.out",
-      },
-      1.2
-    )
-    .to(
-      ".hybrid-img",
-      {
-        scale: 1,
-        z: 0,
-        opacity: 1,
-        duration: 0.5,
-        ease: "bounce.out",
-      },
-      1.6
-    )
-    .to(
-      ".traditional-btn, .modern-btn, .hybrid-btn",
-      {
-        scale: 1,
-        opacity: 1,
-        duration: 0.1,
-        ease: "power4.inOut",
-      },
-      2.8
-    )
+    .to(".traditional-img", {
+      scale: 1, x: 0, opacity: 1, duration: 0.8, ease: "power2.out",
+    }, 1.2)
+    .to(".modern-img", {
+      scale: 1, x: 0, opacity: 1, duration: 0.8, ease: "power2.out",
+    }, 1.2)
+    .to(".hybrid-img", {
+      scale: 1, z: 0, opacity: 1, duration: 0.5, ease: "bounce.out",
+    }, 1.6)
     .to(".traditional-btn, .modern-btn, .hybrid-btn", {
-      skewX: 10,
-      duration: 0.04,
-      ease: "power4.inOut",
+      scale: 1, opacity: 1, duration: 0.1, ease: "power4.inOut",
+    }, 2.8)
+    .to(".traditional-btn, .modern-btn, .hybrid-btn", {
+      skewX: 10, duration: 0.04, ease: "power4.inOut",
     })
     .to(".traditional-btn, .modern-btn, .hybrid-btn", {
-      skewX: 0,
-      x: -20,
-      duration: 0.04,
-      ease: "power4.inOut",
+      skewX: 0, x: -20, duration: 0.04, ease: "power4.inOut",
     })
     .to(".traditional-btn, .modern-btn, .hybrid-btn", {
-      x: 20,
-      scale: 1.1,
-      duration: 0.04,
+      x: 20, scale: 1.1, duration: 0.04,
     })
     .to(".traditional-btn, .modern-btn, .hybrid-btn", {
-      x: 0,
-      scale: 1,
-      skewX: 0,
-      duration: 0.2,
-      ease: "power4.inOut",
+      x: 0, scale: 1, skewX: 0, duration: 0.2, ease: "power4.inOut",
     });
 
-  // Trigger từ video block
+  // Trigger from video
   const blockVideo = document.querySelector(".kpr-video-wrapper video");
-
   if (blockVideo) {
-    blockVideo.addEventListener("play", function () {
-      console.log("Block video started playing");
-      loadTl.play();
-    });
-
-    if (!blockVideo.paused) {
-      loadTl.play();
-    }
+    blockVideo.addEventListener("play", () => loadTl.play());
+    if (!blockVideo.paused) loadTl.play();
   } else {
     setTimeout(() => loadTl.play(), 1000);
   }
@@ -104,10 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
       end: "+=50%",
       scrub: 2.5,
       pin: true,
+      id: 'hero-mask',
       onUpdate: (self) => {
         if (self.progress > 0.1) {
           allowHover = false;
-          if (typeof gifCursor !== "undefined") {
+          if (gifCursor) {
             gifCursor.style.display = "none";
             document.body.style.cursor = "default";
           }
@@ -118,59 +78,45 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-  heroTl.fromTo(
-    ".mask-wrapper",
-    {
-      maskPosition: "49% center",
-      maskSize: "4100% 4100%",
-    },
-    {
-      maskPosition: "50% center",
-      maskSize: "15% 15%",
-      duration: 1,
-    }
-  );
+  heroTl.fromTo(".mask-wrapper", {
+    maskPosition: "49% center",
+    maskSize: "4100% 4100%",
+  }, {
+    maskPosition: "50% center",
+    maskSize: "15% 15%",
+    duration: 1,
+  });
 
   // 3. CUSTOM GIF CURSOR
-  const gifCursor = document.createElement("div");
+  gifCursor = document.createElement("div");
   gifCursor.innerHTML = `<img src="https://cdn.shopify.com/s/files/1/0580/6994/2352/files/button5_blue_1.gif?v=1752294330">`;
   gifCursor.style.cssText = `
-    position: fixed;
-    width: 250px;
-    height: 70px;
-    pointer-events: none;
-    z-index: 9999;
-    display: none;
+    position: fixed; width: 250px; height: 70px; pointer-events: none; 
+    z-index: 9999; display: none;
   `;
   document.body.appendChild(gifCursor);
 
   // 4. HOVER FUNCTIONALITY
-  const targetImages = document.querySelectorAll(
-    ".traditional-img img, .hybrid-img img, .modern-img img"
-  );
+  const targetImages = document.querySelectorAll(".traditional-img img, .hybrid-img img, .modern-img img");
   let loadedCount = 0;
 
   function enableHover() {
-    document
-      .querySelectorAll(".traditional-img, .hybrid-img, .modern-img")
-      .forEach((img) => {
-        img.addEventListener("mouseenter", () => {
-          if (!allowHover) return;
-          gifCursor.style.display = "block";
-          document.body.style.cursor = "none";
-        });
-
-        img.addEventListener("mouseleave", () => {
-          gifCursor.style.display = "none";
-          document.body.style.cursor = "default";
-        });
-
-        img.addEventListener("mousemove", (e) => {
-          if (!allowHover) return;
-          gifCursor.style.left = e.clientX - 125 + "px";
-          gifCursor.style.top = e.clientY - 35 + "px";
-        });
+    document.querySelectorAll(".traditional-img, .hybrid-img, .modern-img").forEach((img) => {
+      img.addEventListener("mouseenter", () => {
+        if (!allowHover) return;
+        gifCursor.style.display = "block";
+        document.body.style.cursor = "none";
       });
+      img.addEventListener("mouseleave", () => {
+        gifCursor.style.display = "none";
+        document.body.style.cursor = "default";
+      });
+      img.addEventListener("mousemove", (e) => {
+        if (!allowHover) return;
+        gifCursor.style.left = e.clientX - 125 + "px";
+        gifCursor.style.top = e.clientY - 35 + "px";
+      });
+    });
   }
 
   targetImages.forEach((img) => {
@@ -179,99 +125,73 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       img.addEventListener("load", () => {
         loadedCount++;
-        if (loadedCount === targetImages.length) {
-          enableHover();
-        }
+        if (loadedCount === targetImages.length) enableHover();
       });
     }
   });
 
-  if (loadedCount === targetImages.length) {
-    enableHover();
-  }
+  if (loadedCount === targetImages.length) enableHover();
 
-  // 5. SMOOTH SCROLL FUNCTIONALITY (UPDATED)
-  // Thay thế function scrollToSection cũ bằng cái này
-  function scrollToSection(targetId) {
+  // 5. SMOOTH SCROLL FUNCTIONALITY - UNIFIED
+  window.scrollToSection = function(targetId) {
     const targetElement = document.getElementById(targetId);
-    if (!targetElement) {
-      console.warn("Target element not found:", targetId);
-      return;
+    if (!targetElement) return;
+
+    // Temporarily disable sticky if navigating to traditional section
+    if (targetId === 'traditional-section' && traditionalStickyTrigger) {
+      traditionalStickyTrigger.disable();
     }
 
     const currentScroll = window.pageYOffset;
     const targetScroll = targetElement.offsetTop;
-
-    // Tìm hero section với selector chính xác cho HTML của bạn
-    const heroSection =
-      document.querySelector(".hero-section.mask-wrapper") ||
-      document.querySelector(".hero-section");
-
-    // Tính toán hero animation end point (50% viewport height)
     const viewportHeight = window.innerHeight;
-    const heroAnimationEnd = viewportHeight * 0.5; // 50% như bạn đã set
+    const heroAnimationEnd = viewportHeight * 0.5;
 
-    console.log("Scrolling from:", currentScroll, "to:", targetScroll);
-    console.log("Hero animation ends at:", heroAnimationEnd);
-
-    // Set initial fade state cho target section elements
     const targetElements = targetElement.querySelectorAll(
       "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
     );
     gsap.set(targetElements, { opacity: 0, y: 30 });
 
-    const scrollTl = gsap.timeline();
+    const scrollTl = gsap.timeline({
+      onComplete: () => {
+        // Re-enable sticky after navigation complete
+        if (targetId === 'traditional-section' && traditionalStickyTrigger) {
+          setTimeout(() => {
+            traditionalStickyTrigger.enable();
+            ScrollTrigger.refresh();
+          }, 200);
+        }
+      }
+    });
 
     if (currentScroll < heroAnimationEnd) {
-      // Đang trong hero section - scroll chậm qua hero animation
       scrollTl
-        // Stage 1: Scroll chậm qua hero animation (50% viewport)
         .to(window, {
           scrollTo: { y: heroAnimationEnd + 50 },
-          duration: 0.3, // Chậm để thấy rõ mask animation
+          duration: 0.3,
           ease: "power3.out",
         })
-        // Stage 2: Pause để animation settle
         .to({}, { duration: 0.3 })
-        // Stage 3: Scroll to target position
         .to(window, {
           scrollTo: { y: targetScroll },
           duration: 1.5,
           ease: "power2.out",
         })
-        // Stage 4: Fade in target section elements
-        .to(
-          targetElements,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: "power2.out",
-          },
-          "-=0.5"
-        );
+        .to(targetElements, {
+          opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power2.out",
+        }, "-=0.5");
     } else {
-      // Đã qua hero section - scroll bình thường
       scrollTl
         .to(window, {
           scrollTo: { y: targetScroll },
           duration: 2,
           ease: "power2.inOut",
         })
-        .to(
-          targetElements,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.08,
-            ease: "power2.out",
-          },
-          "-=0.3"
-        );
+        .to(targetElements, {
+          opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: "power2.out",
+        }, "-=0.3");
     }
-  }
+  };
 
   // 6. ANCHOR LINK OVERRIDE
   document.addEventListener("click", function (e) {
@@ -279,71 +199,66 @@ document.addEventListener("DOMContentLoaded", function () {
     if (link && link.closest(".hero-section")) {
       e.preventDefault();
       const targetId = link.getAttribute("href").substring(1);
-      console.log("Smooth scrolling to:", targetId);
-      scrollToSection(targetId);
+      window.scrollToSection(targetId);
     }
   });
+
 }); // End DOMContentLoaded
 
-// 7. SCROLLTRIGGER REFRESH
+// ===========================================
+// WINDOW LOAD EVENTS - SEQUENTIAL INITIALIZATION
+// ===========================================
+
 window.addEventListener("load", () => {
+  
+  // 1. Register GSAP plugins
+  gsap.registerPlugin(ScrollTrigger);
+  
+  // 2. Initial refresh
   ScrollTrigger.refresh();
+  
+  // 3. Initialize section animations (non-traditional)
+  setTimeout(() => {
+    createSectionAnimation("hybrid-section");
+    createSectionAnimation("modern-section");
+  }, 100);
+  
+  // 4. Initialize traditional sticky (after other animations)
+  setTimeout(() => {
+    initTraditionalSticky();
+  }, 300);
+  
 });
 
-// 8. SECTION ENTRANCE ANIMATIONS (ADD THIS AFTER SCROLLTRIGGER REFRESH)
-gsap.registerPlugin(ScrollTrigger);
+// ===========================================
+// SECTION ENTRANCE ANIMATIONS
+// ===========================================
 
-// Traditional Section Animation
 function createSectionAnimation(sectionId) {
   const section = document.getElementById(sectionId);
   if (!section) return;
 
-  // Set initial states
   const elements = section.querySelectorAll("h1, h2, h3, p, img, .btn, .card");
   gsap.set(elements, { y: 50, opacity: 0 });
 
-  // Create entrance animation
   const sectionTl = gsap.timeline({
     scrollTrigger: {
       trigger: section,
       start: "top 80%",
       end: "top 30%",
       toggleActions: "play none none reverse",
+      id: `${sectionId}-entrance`
     },
   });
 
   sectionTl.to(elements, {
-    y: 0,
-    opacity: 1,
-    duration: 0.8,
-    stagger: 0.1,
-    ease: "power2.out",
+    y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power2.out",
   });
 }
 
-// Initialize section animations
-window.addEventListener("load", () => {
-  ScrollTrigger.refresh();
-
-  // Create animations for sections
-
-  createSectionAnimation("hybrid-section");
-  createSectionAnimation("modern-section");
-});
-
-
-
-
-
 // ===========================================
-// 9. SIMPLE STICKY SCROLL FOR TRADITIONAL SECTION - CLEAN VERSION
+// TRADITIONAL STICKY SCROLL
 // ===========================================
-
-let traditionalStickyTrigger = null; // Store sticky ScrollTrigger
-
-window.addEventListener("load", () => {
-  setTimeout(initTraditionalSticky, 500);
-});
 
 function initTraditionalSticky() {
   const section = document.getElementById('traditional-section');
@@ -371,86 +286,26 @@ function initTraditionalSticky() {
     pin: true,
     scrub: 1,
     animation: tl,
-    id: 'traditional-simple-sticky'
+    id: 'traditional-sticky',
+    refreshPriority: -1 // Lower priority to avoid conflicts
   });
 }
 
 // ===========================================
-// 10. FIX NAVIGATION CONFLICT WITH STICKY
+// UTILITY FUNCTIONS
 // ===========================================
 
-// Override scrollToSection trong DOMContentLoaded
-document.addEventListener("DOMContentLoaded", function() {
-  // Replace existing scrollToSection function
-  const originalScrollToSection = window.scrollToSection;
-  
-  window.scrollToSection = function(targetId) {
-    const targetElement = document.getElementById(targetId);
-    if (!targetElement) {
-      return;
-    }
+// Manual refresh for debugging
+window.refreshAllScrollTriggers = function() {
+  ScrollTrigger.refresh();
+};
 
-    // If navigating to traditional section, temporarily disable sticky
-    if (targetId === 'traditional-section' && traditionalStickyTrigger) {
-      traditionalStickyTrigger.disable();
-    }
-
-    const currentScroll = window.pageYOffset;
-    const targetScroll = targetElement.offsetTop;
-    const viewportHeight = window.innerHeight;
-    const heroAnimationEnd = viewportHeight * 0.5;
-
-    const targetElements = targetElement.querySelectorAll(
-      "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
-    );
-    gsap.set(targetElements, { opacity: 0, y: 30 });
-
-    const scrollTl = gsap.timeline({
-      onComplete: () => {
-        // Re-enable sticky after navigation complete
-        if (targetId === 'traditional-section' && traditionalStickyTrigger) {
-          setTimeout(() => {
-            traditionalStickyTrigger.enable();
-            ScrollTrigger.refresh();
-          }, 100);
-        }
-      }
-    });
-
-    if (currentScroll < heroAnimationEnd) {
-      scrollTl
-        .to(window, {
-          scrollTo: { y: heroAnimationEnd + 50 },
-          duration: 0.3,
-          ease: "power3.out",
-        })
-        .to({}, { duration: 0.3 })
-        .to(window, {
-          scrollTo: { y: targetScroll },
-          duration: 1.5,
-          ease: "power2.out",
-        })
-        .to(targetElements, {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power2.out",
-        }, "-=0.5");
-    } else {
-      scrollTl
-        .to(window, {
-          scrollTo: { y: targetScroll },
-          duration: 2,
-          ease: "power2.inOut",
-        })
-        .to(targetElements, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: "power2.out",
-        }, "-=0.3");
-    }
-  };
-});
+// Get all active ScrollTriggers
+window.getActiveScrollTriggers = function() {
+  return ScrollTrigger.getAll().map(st => ({
+    id: st.id || 'unnamed',
+    trigger: st.trigger?.id || st.trigger?.className || 'unknown',
+    start: st.start,
+    end: st.end
+  }));
+};
