@@ -330,3 +330,231 @@ window.addEventListener("load", () => {
   createSectionAnimation("hybrid-section");
   createSectionAnimation("modern-section");
 });
+
+
+
+// Configuration
+const CONFIG = {
+  // Main section selector (section cần pin)
+  sectionSelector: '.xb-section.id_md1b33ey4fov',
+  
+  // Product wrapper selector (container chứa products)
+  productWrapperSelector: '.kpr-product-wrapper',
+  
+  // Product card selector (các product items)
+  productCardSelector: '.kpr-product-card',
+  
+  // Scroll settings
+  scrollMultiplier: 2, // Tăng để scroll nhanh hơn
+  easing: 'none', // Smooth scrolling
+  anticipatePin: 1, // Prevent jumpy behavior
+};
+
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+  initStickyProductScroll();
+});
+
+function initStickyProductScroll() {
+  const section = document.querySelector(CONFIG.sectionSelector);
+  const productWrapper = document.querySelector(CONFIG.productWrapperSelector);
+  const productCards = document.querySelectorAll(CONFIG.productCardSelector);
+  
+  // Validation
+  if (!section || !productWrapper || productCards.length === 0) {
+    console.warn('GSAP Scroll: Required elements not found');
+    console.log('Section:', section);
+    console.log('Product Wrapper:', productWrapper);
+    console.log('Product Cards:', productCards.length);
+    return;
+  }
+  
+  console.log('✅ GSAP Scroll initialized with', productCards.length, 'products');
+  
+  // Calculate scroll distance
+  const calculateScrollDistance = () => {
+    const wrapperHeight = productWrapper.offsetHeight;
+    const viewportHeight = window.innerHeight;
+    const cardsHeight = Array.from(productCards).reduce((total, card) => {
+      return total + card.offsetHeight;
+    }, 0);
+    
+    // Add some padding for smooth scroll
+    return Math.max(cardsHeight - viewportHeight + 200, 200);
+  };
+  
+  // Create timeline for product scrolling
+  const createScrollTimeline = () => {
+    const tl = gsap.timeline();
+    const scrollDistance = calculateScrollDistance();
+    
+    // Set initial state
+    gsap.set(productWrapper, {
+      position: 'relative',
+      overflow: 'hidden'
+    });
+    
+    // Animate products moving up (negative Y)
+    tl.to(productCards, {
+      y: -scrollDistance,
+      duration: 1,
+      ease: CONFIG.easing,
+      stagger: 0, // Move all cards together
+    });
+    
+    return tl;
+  };
+  
+  // Create main ScrollTrigger
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top top',
+    end: () => {
+      const scrollDistance = calculateScrollDistance();
+      return `+=${scrollDistance * CONFIG.scrollMultiplier}`;
+    },
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: CONFIG.anticipatePin,
+    scrub: 1, // Smooth scrub animation
+    animation: createScrollTimeline(),
+    
+    // Debug & callbacks
+    onUpdate: (self) => {
+      // Optional: Add progress indicator
+      const progress = Math.round(self.progress * 100);
+      console.log(`Scroll progress: ${progress}%`);
+      
+      // Optional: Update custom progress bar
+      updateProgressBar(progress);
+    },
+    
+    onToggle: (self) => {
+      console.log('Sticky section active:', self.isActive);
+    },
+    
+    // Refresh on resize
+    refreshPriority: -1,
+  });
+  
+  // Handle window resize
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+      console.log('🔄 ScrollTrigger refreshed on resize');
+    }, 100);
+  });
+  
+  // Optional: Add progress bar
+  createProgressBar();
+}
+
+// Optional: Progress bar functionality
+function createProgressBar() {
+  // Skip if progress bar already exists
+  if (document.querySelector('.kpr-progress-bar')) return;
+  
+  const progressHTML = `
+    <div class="kpr-progress-bar" style="
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      border-radius: 25px;
+      border: 1px solid rgba(255,255,255,0.2);
+      z-index: 1000;
+      color: white;
+      font-size: 12px;
+      display: none;
+    ">
+      <div style="margin-bottom: 5px; text-align: center;">Product Scroll</div>
+      <div style="width: 150px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;">
+        <div class="kpr-progress-fill" style="
+          height: 100%;
+          background: linear-gradient(90deg, #12b939, #4ecdc4);
+          border-radius: 2px;
+          width: 0%;
+          transition: width 0.1s ease;
+        "></div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', progressHTML);
+}
+
+function updateProgressBar(progress) {
+  const progressBar = document.querySelector('.kpr-progress-bar');
+  const progressFill = document.querySelector('.kpr-progress-fill');
+  
+  if (progressBar && progressFill) {
+    if (progress > 0 && progress < 100) {
+      progressBar.style.display = 'block';
+      progressFill.style.width = `${progress}%`;
+    } else {
+      progressBar.style.display = 'none';
+    }
+  }
+}
+
+// Advanced: Add smooth scroll hints for better UX
+function addScrollHints() {
+  const section = document.querySelector(CONFIG.sectionSelector);
+  if (!section) return;
+  
+  // Add CSS for smooth scrolling hints
+  const style = document.createElement('style');
+  style.textContent = `
+    .kpr-scroll-hint {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+    
+    .kpr-scroll-hint.hidden {
+      opacity: 0;
+    }
+    
+    /* Optional: Smooth scrolling for better performance */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Optimize product cards for animation */
+    .kpr-product-card {
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+  `;
+  
+  document.head.appendChild(style);
+  
+  // Add hint element
+  section.insertAdjacentHTML('beforeend', `
+    <div class="kpr-scroll-hint">
+      ↓ Scroll to see products
+    </div>
+  `);
+}
+
+// Initialize scroll hints
+document.addEventListener('DOMContentLoaded', addScrollHints);
+
+// Utility: Manual refresh function (for debugging)
+window.refreshKprScroll = function() {
+  ScrollTrigger.refresh();
+  console.log('🔄 KPR Scroll manually refreshed');
+};
+
+// Export for potential external use
+window.KprScrollConfig = CONFIG;
