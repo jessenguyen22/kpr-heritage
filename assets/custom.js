@@ -505,405 +505,89 @@ window.addEventListener("load", () => {
 
 
 // ===========================================
-// 9. ENHANCED STICKY PRODUCT SCROLL FOR TRADITIONAL SECTION
-// With customizable start position and floating products effect
+// 9. SIMPLE STICKY SCROLL FOR TRADITIONAL SECTION
 // ===========================================
 
-let traditionalStickyInitialized = false;
-let traditionalScrollTrigger = null;
-
-// ⚙️ CONFIGURATION - Customize these values
-const TRADITIONAL_CONFIG = {
-  // Điều chỉnh vị trí bắt đầu sticky (0-1, 0 = top, 1 = bottom)
-  stickyStartOffset: 0.2, // Section sẽ sticky khi 20% section visible
-  
-  // Điều chỉnh tốc độ scroll
-  scrollMultiplier: 2.5,
-  
-  // Float effect settings
-  enableFloatEffect: true,
-  floatDistance: -200, // Negative = bay lên trên
-  floatOpacity: 0.3,
-  floatScale: 0.8,
-  
-  // Animation settings
-  scrubSmoothness: 1.5,
-  anticipatePin: 1,
+// Config
+const CONFIG = {
+  startOffset: "top+=20%",  // Sticky start position
+  floatDistance: -200,      // Products float up distance
+  scrollSpeed: 2            // Scroll multiplier
 };
 
+// Wait for existing ScrollTriggers to load
 window.addEventListener("load", () => {
-  // Monitor scroll position để không conflict với hero scroll
-  monitorHeroScrollCompletion();
+  setTimeout(initTraditionalSticky, 500);
 });
 
-function monitorHeroScrollCompletion() {
-  const heroSection = document.querySelector(".hero-section.mask-wrapper") || 
-                     document.querySelector(".hero-section");
+function initTraditionalSticky() {
+  const section = document.getElementById('traditional-section');
+  const wrapper = section?.querySelector('.kpr-product-wrapper');
+  const cards = section?.querySelectorAll('.kpr-product-card');
   
-  if (!heroSection) {
-    setTimeout(() => initTraditionalStickyScroll(), 100);
-    return;
-  }
+  if (!section || !wrapper || !cards.length) return;
   
-  const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5;
+  console.log('✅ Simple traditional sticky initialized');
   
-  console.log('🎯 Monitoring hero completion at:', heroAnimationEnd);
-  
-  ScrollTrigger.create({
-    trigger: "body",
-    start: 0,
-    end: "max",
-    onUpdate: (self) => {
-      const currentScroll = window.pageYOffset;
-      
-      if (currentScroll > heroAnimationEnd + 100 && !traditionalStickyInitialized) {
-        console.log('✅ Hero scroll completed, initializing traditional sticky...');
-        traditionalStickyInitialized = true;
-        setTimeout(() => {
-          initTraditionalStickyScroll();
-        }, 200);
-      }
-      
-      if (currentScroll < heroAnimationEnd && traditionalStickyInitialized && traditionalScrollTrigger) {
-        console.log('🔄 User scrolled back to hero, disabling sticky temporarily');
-        disableTraditionalSticky();
-      }
-    }
-  });
-}
-
-function initTraditionalStickyScroll() {
-  const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5;
-  const currentScroll = window.pageYOffset;
-  
-  if (currentScroll < heroAnimationEnd) {
-    console.log('⏳ Still in hero area, postponing sticky init');
-    traditionalStickyInitialized = false;
-    return;
-  }
-  
-  const traditionalSection = document.getElementById('traditional-section');
-  const productWrapper = traditionalSection?.querySelector('.kpr-product-wrapper');
-  const productCards = traditionalSection?.querySelectorAll('.kpr-product-card');
-  
-  if (!traditionalSection || !productWrapper || !productCards.length) {
-    console.log('🔍 Traditional sticky: Required elements not found');
-    return;
-  }
-  
-  console.log('✅ Traditional sticky initialized with', productCards.length, 'products');
+  // Set overflow visible for float effect
+  gsap.set(wrapper, { overflow: 'visible' });
   
   // Calculate scroll distance
-  const calculateScrollDistance = () => {
-    const viewportHeight = window.innerHeight;
-    const totalCardsHeight = Array.from(productCards).reduce((total, card) => {
-      return total + card.offsetHeight + 30;
-    }, 0);
-    
-    return Math.max(totalCardsHeight - viewportHeight + 400, 600);
-  };
+  const scrollDistance = cards.length * 400; // Simple calculation
   
-  // 🎨 Setup container for floating effect
-  gsap.set(productWrapper, {
-    position: 'relative',
-    overflow: TRADITIONAL_CONFIG.enableFloatEffect ? 'visible' : 'hidden', // Allow overflow for float effect
-  });
-  
-  gsap.set(productCards, {
-    willChange: 'transform',
-    transformOrigin: 'center center',
-  });
-  
-  // 🚀 Create enhanced timeline with floating effect
-  const traditionalTl = gsap.timeline();
-  
-  // Main scroll animation
-  traditionalTl.to(productCards, {
-    y: () => -calculateScrollDistance(),
+  // Main sticky timeline
+  const tl = gsap.timeline();
+  tl.to(cards, {
+    y: -scrollDistance,
     duration: 1,
-    ease: 'none',
+    ease: 'none'
   });
   
-  // 🌟 Float effect - products bay lên trên khi scroll qua
-  if (TRADITIONAL_CONFIG.enableFloatEffect) {
-    productCards.forEach((card, index) => {
-      // Create individual float timeline for each card
-      ScrollTrigger.create({
-        trigger: card,
-        start: 'bottom center', // Khi card scroll qua center
-        end: 'bottom top-=100',
-        scrub: 1,
-        onUpdate: (self) => {
-          // Calculate float progress (0 to 1)
-          const progress = self.progress;
-          
-          // Apply floating effect
-          gsap.to(card, {
-            y: `+=${TRADITIONAL_CONFIG.floatDistance * progress}`,
-            opacity: 1 - (progress * (1 - TRADITIONAL_CONFIG.floatOpacity)),
-            scale: 1 - (progress * (1 - TRADITIONAL_CONFIG.floatScale)),
-            duration: 0.1,
-            ease: 'none',
-          });
-        },
-        id: `traditional-float-${index}`,
-      });
-    });
-  }
-  
-  // 📌 Create main sticky ScrollTrigger with custom start position
-  traditionalScrollTrigger = ScrollTrigger.create({
-    id: 'traditional-sticky',
-    trigger: traditionalSection,
-    start: `top+=${TRADITIONAL_CONFIG.stickyStartOffset * 100}% top`, // Customizable start
-    end: () => {
-      const scrollDistance = calculateScrollDistance();
-      return `+=${scrollDistance * TRADITIONAL_CONFIG.scrollMultiplier}`;
-    },
+  // Sticky ScrollTrigger
+  ScrollTrigger.create({
+    trigger: section,
+    start: CONFIG.startOffset,
+    end: `+=${scrollDistance * CONFIG.scrollSpeed}`,
     pin: true,
-    pinSpacing: true,
-    scrub: TRADITIONAL_CONFIG.scrubSmoothness,
-    anticipatePin: TRADITIONAL_CONFIG.anticipatePin,
-    animation: traditionalTl,
-    
-    onEnter: () => {
-      console.log('🔒 Traditional section pinned at custom offset:', TRADITIONAL_CONFIG.stickyStartOffset);
-    },
-    
-    onLeave: () => {
-      console.log('🔓 Traditional section unpinned');
-    },
-    
-    onUpdate: (self) => {
-      const progress = Math.round(self.progress * 100);
-      updateTraditionalProgress(progress);
-    },
-    
-    refreshPriority: -2,
+    scrub: 1,
+    animation: tl,
+    id: 'simple-traditional'
   });
   
-  // Handle resize
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      if (traditionalScrollTrigger) {
-        traditionalScrollTrigger.refresh();
-        // Refresh float triggers
-        if (TRADITIONAL_CONFIG.enableFloatEffect) {
-          productCards.forEach((card, index) => {
-            ScrollTrigger.getById(`traditional-float-${index}`)?.refresh();
-          });
-        }
-        console.log('🔄 Traditional sticky and float effects refreshed');
-      }
-    }, 150);
-  });
-}
-
-function disableTraditionalSticky() {
-  if (traditionalScrollTrigger) {
-    traditionalScrollTrigger.kill();
-    traditionalScrollTrigger = null;
-    
-    // Kill float effects
-    const productCards = document.querySelectorAll('#traditional-section .kpr-product-card');
-    productCards.forEach((card, index) => {
-      ScrollTrigger.getById(`traditional-float-${index}`)?.kill();
+  // Float effect for each card
+  cards.forEach((card, i) => {
+    ScrollTrigger.create({
+      trigger: card,
+      start: 'bottom center',
+      end: 'bottom top-=100',
+      scrub: 1,
+      animation: gsap.to(card, {
+        y: CONFIG.floatDistance,
+        opacity: 0.3,
+        scale: 0.8,
+        duration: 1,
+        ease: 'none'
+      }),
+      id: `float-${i}`
     });
-    
-    console.log('❌ Traditional sticky and float effects disabled');
-  }
-  traditionalStickyInitialized = false;
+  });
 }
 
-// Override existing scrollToSection
-const originalScrollToSection = window.scrollToSection;
-
-window.scrollToSection = function(targetId) {
-  console.log('📍 Scrolling to section:', targetId);
+// Simple config update
+window.updateStickyConfig = function(newConfig) {
+  Object.assign(CONFIG, newConfig);
   
-  if (traditionalScrollTrigger && targetId === 'traditional-section') {
-    console.log('⏸️ Temporarily disabling sticky for smooth navigation');
-    disableTraditionalSticky();
-    
-    setTimeout(() => {
-      if (window.pageYOffset > window.innerHeight * 0.5) {
-        traditionalStickyInitialized = false;
-        setTimeout(() => initTraditionalStickyScroll(), 500);
-      }
-    }, 3000);
-  }
+  // Kill existing
+  ScrollTrigger.getById('simple-traditional')?.kill();
+  document.querySelectorAll('.kpr-product-card').forEach((card, i) => {
+    ScrollTrigger.getById(`float-${i}`)?.kill();
+  });
   
-  if (originalScrollToSection) {
-    return originalScrollToSection(targetId);
-  }
-  
-  // Fallback logic (same as before)
-  const targetElement = document.getElementById(targetId);
-  if (!targetElement) {
-    console.warn("Target element not found:", targetId);
-    return;
-  }
-
-  const currentScroll = window.pageYOffset;
-  const targetScroll = targetElement.offsetTop;
-  const heroSection = document.querySelector(".hero-section.mask-wrapper") || 
-                     document.querySelector(".hero-section");
-  const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5;
-
-  const targetElements = targetElement.querySelectorAll(
-    "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
-  );
-  gsap.set(targetElements, { opacity: 0, y: 30 });
-
-  const scrollTl = gsap.timeline();
-
-  if (currentScroll < heroAnimationEnd) {
-    scrollTl
-      .to(window, {
-        scrollTo: { y: heroAnimationEnd + 50 },
-        duration: 0.3,
-        ease: "power3.out",
-      })
-      .to({}, { duration: 0.3 })
-      .to(window, {
-        scrollTo: { y: targetScroll },
-        duration: 1.5,
-        ease: "power2.out",
-      })
-      .to(targetElements, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out",
-      }, "-=0.5");
-  } else {
-    scrollTl
-      .to(window, {
-        scrollTo: { y: targetScroll },
-        duration: 2,
-        ease: "power2.inOut",
-      })
-      .to(targetElements, {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: "power2.out",
-      }, "-=0.3");
-  }
+  // Restart
+  setTimeout(initTraditionalSticky, 100);
 };
 
-// Progress bar functions
-function createTraditionalProgress() {
-  if (document.querySelector('.traditional-progress')) return;
-  
-  const progressHTML = `
-    <div class="traditional-progress" style="
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: rgba(18, 185, 57, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 8px 16px;
-      border-radius: 20px;
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      z-index: 9998;
-      display: none;
-      border: 1px solid rgba(255,255,255,0.1);
-    ">
-      <div style="margin-bottom: 3px;">TRADITIONAL PRODUCTS</div>
-      <div style="width: 120px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 1px; overflow: hidden;">
-        <div class="traditional-progress-fill" style="
-          height: 100%;
-          background: white;
-          border-radius: 1px;
-          width: 0%;
-          transition: width 0.1s ease;
-        "></div>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', progressHTML);
-}
+// Usage examples:
+// window.updateStickyConfig({ startOffset: "top+=50%" });
+// window.updateStickyConfig({ floatDistance: -300 });
 
-function updateTraditionalProgress(progress) {
-  const progressBar = document.querySelector('.traditional-progress');
-  const progressFill = document.querySelector('.traditional-progress-fill');
-  
-  if (progressBar && progressFill) {
-    if (progress > 5 && progress < 95) {
-      progressBar.style.display = 'block';
-      progressFill.style.width = `${progress}%`;
-    } else {
-      progressBar.style.display = 'none';
-    }
-  }
-}
-
-// Initialize progress bar
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    createTraditionalProgress();
-  }, 200);
-});
-
-// ===========================================
-// 10. CONFIGURATION & UTILITY FUNCTIONS
-// ===========================================
-
-// 🛠️ Update configuration at runtime
-window.updateTraditionalConfig = function(newConfig) {
-  Object.assign(TRADITIONAL_CONFIG, newConfig);
-  console.log('📝 Traditional config updated:', TRADITIONAL_CONFIG);
-  
-  // Refresh if already initialized
-  if (traditionalScrollTrigger) {
-    window.resetTraditionalScroll();
-  }
-};
-
-// Example usage:
-// window.updateTraditionalConfig({
-//   stickyStartOffset: 0.5, // Start sticky when 50% of section is visible
-//   floatDistance: -300,    // Float further up
-//   floatOpacity: 0.1       // More transparent when floating
-// });
-
-window.refreshTraditionalScroll = function() {
-  if (traditionalScrollTrigger) {
-    traditionalScrollTrigger.refresh();
-    console.log('🔄 Traditional scroll refreshed');
-  } else {
-    console.log('❌ Traditional ScrollTrigger not active');
-  }
-};
-
-window.resetTraditionalScroll = function() {
-  disableTraditionalSticky();
-  traditionalStickyInitialized = false;
-  setTimeout(() => {
-    if (window.pageYOffset > window.innerHeight * 0.5) {
-      initTraditionalStickyScroll();
-    }
-  }, 100);
-};
-
-// 🎛️ Live configuration panel (for testing)
-window.showTraditionalConfig = function() {
-  console.log('🎛️ Traditional Scroll Configuration:');
-  console.log('stickyStartOffset:', TRADITIONAL_CONFIG.stickyStartOffset, '(0-1, 0=top, 1=bottom)');
-  console.log('scrollMultiplier:', TRADITIONAL_CONFIG.scrollMultiplier, '(higher = slower scroll)');
-  console.log('enableFloatEffect:', TRADITIONAL_CONFIG.enableFloatEffect);
-  console.log('floatDistance:', TRADITIONAL_CONFIG.floatDistance, '(negative = up, positive = down)');
-  console.log('floatOpacity:', TRADITIONAL_CONFIG.floatOpacity, '(0-1)');
-  console.log('floatScale:', TRADITIONAL_CONFIG.floatScale, '(0-1)');
-};
