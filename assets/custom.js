@@ -503,3 +503,333 @@ window.addEventListener("load", () => {
   }, 200);
 });
 
+
+// ===========================================
+// 9. STICKY PRODUCT SCROLL FOR TRADITIONAL SECTION
+// Compatible với existing hero scroll logic
+// ===========================================
+
+let traditionalStickyInitialized = false;
+let traditionalScrollTrigger = null;
+
+window.addEventListener("load", () => {
+  // Monitor scroll position để không conflict với hero scroll
+  monitorHeroScrollCompletion();
+});
+
+function monitorHeroScrollCompletion() {
+  const heroSection = document.querySelector(".hero-section.mask-wrapper") || 
+                     document.querySelector(".hero-section");
+  
+  if (!heroSection) {
+    // Nếu không có hero section, init luôn
+    setTimeout(() => initTraditionalStickyScroll(), 100);
+    return;
+  }
+  
+  const viewportHeight = window.innerHeight;
+  const heroAnimationEnd = viewportHeight * 0.5; // 50% như trong code gốc
+  
+  console.log('🎯 Monitoring hero completion at:', heroAnimationEnd);
+  
+  // Create a lightweight ScrollTrigger để monitor hero completion
+  ScrollTrigger.create({
+    trigger: "body",
+    start: 0,
+    end: "max",
+    onUpdate: (self) => {
+      const currentScroll = window.pageYOffset;
+      
+      // Chỉ init sticky scroll khi user đã scroll qua hero animation
+      if (currentScroll > heroAnimationEnd + 100 && !traditionalStickyInitialized) {
+        console.log('✅ Hero scroll completed, initializing traditional sticky...');
+        traditionalStickyInitialized = true;
+        
+        // Delay nhỏ để đảm bảo không conflict
+        setTimeout(() => {
+          initTraditionalStickyScroll();
+        }, 200);
+      }
+      
+      // Disable sticky nếu user scroll back lên hero
+      if (currentScroll < heroAnimationEnd && traditionalStickyInitialized && traditionalScrollTrigger) {
+        console.log('🔄 User scrolled back to hero, disabling sticky temporarily');
+        disableTraditionalSticky();
+      }
+    }
+  });
+}
+
+function initTraditionalStickyScroll() {
+  // Kiểm tra xem user có đang trong quá trình hero scroll không
+  const viewportHeight = window.innerHeight;
+  const heroAnimationEnd = viewportHeight * 0.5;
+  const currentScroll = window.pageYOffset;
+  
+  if (currentScroll < heroAnimationEnd) {
+    console.log('⏳ Still in hero area, postponing sticky init');
+    traditionalStickyInitialized = false;
+    return;
+  }
+  
+  const traditionalSection = document.getElementById('traditional-section');
+  const productWrapper = traditionalSection?.querySelector('.kpr-product-wrapper');
+  const productCards = traditionalSection?.querySelectorAll('.kpr-product-card');
+  
+  // Validation
+  if (!traditionalSection || !productWrapper || !productCards.length) {
+    console.log('🔍 Traditional sticky: Required elements not found');
+    return;
+  }
+  
+  console.log('✅ Traditional sticky initialized with', productCards.length, 'products');
+  
+  // Calculate scroll distance
+  const calculateScrollDistance = () => {
+    const viewportHeight = window.innerHeight;
+    const totalCardsHeight = Array.from(productCards).reduce((total, card) => {
+      return total + card.offsetHeight + 30;
+    }, 0);
+    
+    return Math.max(totalCardsHeight - viewportHeight + 300, 500);
+  };
+  
+  // Set performance styles
+  gsap.set(productWrapper, {
+    position: 'relative',
+    overflow: 'hidden'
+  });
+  
+  gsap.set(productCards, {
+    willChange: 'transform'
+  });
+  
+  // Create sticky timeline
+  const traditionalTl = gsap.timeline();
+  
+  traditionalTl.to(productCards, {
+    y: () => -calculateScrollDistance(),
+    duration: 1,
+    ease: 'none',
+  });
+  
+  // Create ScrollTrigger với logic tránh conflict
+  traditionalScrollTrigger = ScrollTrigger.create({
+    id: 'traditional-sticky',
+    trigger: traditionalSection,
+    start: 'top top',
+    end: () => {
+      const scrollDistance = calculateScrollDistance();
+      return `+=${scrollDistance * 2}`;
+    },
+    pin: true,
+    pinSpacing: true,
+    scrub: 1.5,
+    anticipatePin: 1,
+    animation: traditionalTl,
+    
+    onEnter: () => {
+      console.log('🔒 Traditional section pinned');
+    },
+    
+    onLeave: () => {
+      console.log('🔓 Traditional section unpinned');
+    },
+    
+    onUpdate: (self) => {
+      const progress = Math.round(self.progress * 100);
+      updateTraditionalProgress(progress);
+    },
+    
+    // Thấp priority để không conflict với smooth scroll
+    refreshPriority: -2,
+  });
+  
+  // Handle resize
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (traditionalScrollTrigger) {
+        traditionalScrollTrigger.refresh();
+        console.log('🔄 Traditional sticky refreshed');
+      }
+    }, 150);
+  });
+}
+
+function disableTraditionalSticky() {
+  if (traditionalScrollTrigger) {
+    traditionalScrollTrigger.kill();
+    traditionalScrollTrigger = null;
+    console.log('❌ Traditional sticky disabled');
+  }
+  traditionalStickyInitialized = false;
+}
+
+// Override existing scrollToSection để compatible
+// Backup original function nếu có
+const originalScrollToSection = window.scrollToSection;
+
+window.scrollToSection = function(targetId) {
+  console.log('📍 Scrolling to section:', targetId);
+  
+  // Temporarily disable sticky scroll during navigation
+  if (traditionalScrollTrigger && targetId === 'traditional-section') {
+    console.log('⏸️ Temporarily disabling sticky for smooth navigation');
+    disableTraditionalSticky();
+    
+    // Re-enable after scroll completion
+    setTimeout(() => {
+      if (window.pageYOffset > window.innerHeight * 0.5) {
+        traditionalStickyInitialized = false; // Reset flag
+        setTimeout(() => initTraditionalStickyScroll(), 500);
+      }
+    }, 3000); // Wait for scroll animation to complete
+  }
+  
+  // Call original function nếu có
+  if (originalScrollToSection) {
+    return originalScrollToSection(targetId);
+  }
+  
+  // Fallback sử dụng logic gốc của bạn
+  const targetElement = document.getElementById(targetId);
+  if (!targetElement) {
+    console.warn("Target element not found:", targetId);
+    return;
+  }
+
+  const currentScroll = window.pageYOffset;
+  const targetScroll = targetElement.offsetTop;
+  const heroSection = document.querySelector(".hero-section.mask-wrapper") || 
+                     document.querySelector(".hero-section");
+  const viewportHeight = window.innerHeight;
+  const heroAnimationEnd = viewportHeight * 0.5;
+
+  console.log("Scrolling from:", currentScroll, "to:", targetScroll);
+
+  const targetElements = targetElement.querySelectorAll(
+    "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
+  );
+  gsap.set(targetElements, { opacity: 0, y: 30 });
+
+  const scrollTl = gsap.timeline();
+
+  if (currentScroll < heroAnimationEnd) {
+    scrollTl
+      .to(window, {
+        scrollTo: { y: heroAnimationEnd + 50 },
+        duration: 0.3,
+        ease: "power3.out",
+      })
+      .to({}, { duration: 0.3 })
+      .to(window, {
+        scrollTo: { y: targetScroll },
+        duration: 1.5,
+        ease: "power2.out",
+      })
+      .to(targetElements, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power2.out",
+      }, "-=0.5");
+  } else {
+    scrollTl
+      .to(window, {
+        scrollTo: { y: targetScroll },
+        duration: 2,
+        ease: "power2.inOut",
+      })
+      .to(targetElements, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.08,
+        ease: "power2.out",
+      }, "-=0.3");
+  }
+};
+
+// Progress bar functions
+function createTraditionalProgress() {
+  if (document.querySelector('.traditional-progress')) return;
+  
+  const progressHTML = `
+    <div class="traditional-progress" style="
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(18, 185, 57, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      z-index: 9998;
+      display: none;
+      border: 1px solid rgba(255,255,255,0.1);
+    ">
+      <div style="margin-bottom: 3px;">TRADITIONAL PRODUCTS</div>
+      <div style="width: 120px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 1px; overflow: hidden;">
+        <div class="traditional-progress-fill" style="
+          height: 100%;
+          background: white;
+          border-radius: 1px;
+          width: 0%;
+          transition: width 0.1s ease;
+        "></div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', progressHTML);
+}
+
+function updateTraditionalProgress(progress) {
+  const progressBar = document.querySelector('.traditional-progress');
+  const progressFill = document.querySelector('.traditional-progress-fill');
+  
+  if (progressBar && progressFill) {
+    if (progress > 5 && progress < 95) {
+      progressBar.style.display = 'block';
+      progressFill.style.width = `${progress}%`;
+    } else {
+      progressBar.style.display = 'none';
+    }
+  }
+}
+
+// Initialize progress bar
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    createTraditionalProgress();
+  }, 200);
+});
+
+// ===========================================
+// 10. UTILITY FUNCTIONS
+// ===========================================
+
+window.refreshTraditionalScroll = function() {
+  if (traditionalScrollTrigger) {
+    traditionalScrollTrigger.refresh();
+    console.log('🔄 Traditional scroll refreshed');
+  } else {
+    console.log('❌ Traditional ScrollTrigger not active');
+  }
+};
+
+window.resetTraditionalScroll = function() {
+  disableTraditionalSticky();
+  traditionalStickyInitialized = false;
+  setTimeout(() => {
+    if (window.pageYOffset > window.innerHeight * 0.5) {
+      initTraditionalStickyScroll();
+    }
+  }, 100);
+};
+
