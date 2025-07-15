@@ -506,7 +506,6 @@ window.addEventListener("load", () => {
 
 // ===========================================
 // 9. STICKY PRODUCT SCROLL FOR TRADITIONAL SECTION
-// Compatible với existing hero scroll logic
 // ===========================================
 
 let traditionalStickyInitialized = false;
@@ -576,17 +575,15 @@ function initTraditionalStickyScroll() {
     return Math.max(totalCardsHeight - viewportHeight + 300, 500);
   };
   
-  // Set overflow visible for floating effect
   gsap.set(productWrapper, {
     position: 'relative',
-    overflow: 'visible'
+    overflow: 'hidden'
   });
   
   gsap.set(productCards, {
     willChange: 'transform'
   });
   
-  // Create sticky timeline
   const traditionalTl = gsap.timeline();
   
   traditionalTl.to(productCards, {
@@ -595,11 +592,10 @@ function initTraditionalStickyScroll() {
     ease: 'none',
   });
   
-  // Create ScrollTrigger với start position cao hơn 15%
   traditionalScrollTrigger = ScrollTrigger.create({
     id: 'traditional-sticky',
     trigger: traditionalSection,
-    start: 'top+=15% top', // Sticky cao hơn 15% viewport
+    start: 'top top',
     end: () => {
       const scrollDistance = calculateScrollDistance();
       return `+=${scrollDistance * 2}`;
@@ -618,34 +614,12 @@ function initTraditionalStickyScroll() {
     refreshPriority: -2,
   });
   
-  // Floating effect for each product card
-  productCards.forEach((card, index) => {
-    ScrollTrigger.create({
-      trigger: card,
-      start: 'bottom center',
-      end: 'bottom top-=100',
-      scrub: 1,
-      animation: gsap.to(card, {
-        y: -200, // Float up
-        opacity: 0.3,
-        scale: 0.8,
-        duration: 1,
-        ease: 'none'
-      }),
-      id: `traditional-float-${index}`,
-    });
-  });
-  
-  // Handle resize
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       if (traditionalScrollTrigger) {
         traditionalScrollTrigger.refresh();
-        productCards.forEach((card, index) => {
-          ScrollTrigger.getById(`traditional-float-${index}`)?.refresh();
-        });
       }
     }, 150);
   });
@@ -655,17 +629,10 @@ function disableTraditionalSticky() {
   if (traditionalScrollTrigger) {
     traditionalScrollTrigger.kill();
     traditionalScrollTrigger = null;
-    
-    // Kill floating effects
-    const productCards = document.querySelectorAll('#traditional-section .kpr-product-card');
-    productCards.forEach((card, index) => {
-      ScrollTrigger.getById(`traditional-float-${index}`)?.kill();
-    });
   }
   traditionalStickyInitialized = false;
 }
 
-// Override existing scrollToSection để compatible
 const originalScrollToSection = window.scrollToSection;
 
 window.scrollToSection = function(targetId) {
@@ -740,7 +707,6 @@ window.scrollToSection = function(targetId) {
   }
 };
 
-// Progress bar functions
 function createTraditionalProgress() {
   if (document.querySelector('.traditional-progress')) return;
   
@@ -790,14 +756,12 @@ function updateTraditionalProgress(progress) {
   }
 }
 
-// Initialize progress bar
 window.addEventListener("load", () => {
   setTimeout(() => {
     createTraditionalProgress();
   }, 200);
 });
 
-// Utility functions
 window.refreshTraditionalScroll = function() {
   if (traditionalScrollTrigger) {
     traditionalScrollTrigger.refresh();
