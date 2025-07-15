@@ -339,6 +339,8 @@ window.addEventListener("load", () => {
 // 9. SIMPLE STICKY SCROLL FOR TRADITIONAL SECTION - CLEAN VERSION
 // ===========================================
 
+let traditionalStickyTrigger = null; // Store sticky ScrollTrigger
+
 window.addEventListener("load", () => {
   setTimeout(initTraditionalSticky, 500);
 });
@@ -362,7 +364,7 @@ function initTraditionalSticky() {
   });
   
   // Pin section and scroll products
-  ScrollTrigger.create({
+  traditionalStickyTrigger = ScrollTrigger.create({
     trigger: section,
     start: 'top+=20% top',
     end: `+=${scrollDistance}`,
@@ -373,3 +375,82 @@ function initTraditionalSticky() {
   });
 }
 
+// ===========================================
+// 10. FIX NAVIGATION CONFLICT WITH STICKY
+// ===========================================
+
+// Override scrollToSection trong DOMContentLoaded
+document.addEventListener("DOMContentLoaded", function() {
+  // Replace existing scrollToSection function
+  const originalScrollToSection = window.scrollToSection;
+  
+  window.scrollToSection = function(targetId) {
+    const targetElement = document.getElementById(targetId);
+    if (!targetElement) {
+      return;
+    }
+
+    // If navigating to traditional section, temporarily disable sticky
+    if (targetId === 'traditional-section' && traditionalStickyTrigger) {
+      traditionalStickyTrigger.disable();
+    }
+
+    const currentScroll = window.pageYOffset;
+    const targetScroll = targetElement.offsetTop;
+    const viewportHeight = window.innerHeight;
+    const heroAnimationEnd = viewportHeight * 0.5;
+
+    const targetElements = targetElement.querySelectorAll(
+      "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
+    );
+    gsap.set(targetElements, { opacity: 0, y: 30 });
+
+    const scrollTl = gsap.timeline({
+      onComplete: () => {
+        // Re-enable sticky after navigation complete
+        if (targetId === 'traditional-section' && traditionalStickyTrigger) {
+          setTimeout(() => {
+            traditionalStickyTrigger.enable();
+            ScrollTrigger.refresh();
+          }, 100);
+        }
+      }
+    });
+
+    if (currentScroll < heroAnimationEnd) {
+      scrollTl
+        .to(window, {
+          scrollTo: { y: heroAnimationEnd + 50 },
+          duration: 0.3,
+          ease: "power3.out",
+        })
+        .to({}, { duration: 0.3 })
+        .to(window, {
+          scrollTo: { y: targetScroll },
+          duration: 1.5,
+          ease: "power2.out",
+        })
+        .to(targetElements, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+        }, "-=0.5");
+    } else {
+      scrollTl
+        .to(window, {
+          scrollTo: { y: targetScroll },
+          duration: 2,
+          ease: "power2.inOut",
+        })
+        .to(targetElements, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power2.out",
+        }, "-=0.3");
+    }
+  };
+});
