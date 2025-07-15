@@ -513,7 +513,6 @@ let traditionalStickyInitialized = false;
 let traditionalScrollTrigger = null;
 
 window.addEventListener("load", () => {
-  // Monitor scroll position để không conflict với hero scroll
   monitorHeroScrollCompletion();
 });
 
@@ -522,17 +521,13 @@ function monitorHeroScrollCompletion() {
                      document.querySelector(".hero-section");
   
   if (!heroSection) {
-    // Nếu không có hero section, init luôn
     setTimeout(() => initTraditionalStickyScroll(), 100);
     return;
   }
   
   const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5; // 50% như trong code gốc
+  const heroAnimationEnd = viewportHeight * 0.5;
   
-  console.log('🎯 Monitoring hero completion at:', heroAnimationEnd);
-  
-  // Create a lightweight ScrollTrigger để monitor hero completion
   ScrollTrigger.create({
     trigger: "body",
     start: 0,
@@ -540,20 +535,14 @@ function monitorHeroScrollCompletion() {
     onUpdate: (self) => {
       const currentScroll = window.pageYOffset;
       
-      // Chỉ init sticky scroll khi user đã scroll qua hero animation
       if (currentScroll > heroAnimationEnd + 100 && !traditionalStickyInitialized) {
-        console.log('✅ Hero scroll completed, initializing traditional sticky...');
         traditionalStickyInitialized = true;
-        
-        // Delay nhỏ để đảm bảo không conflict
         setTimeout(() => {
           initTraditionalStickyScroll();
         }, 200);
       }
       
-      // Disable sticky nếu user scroll back lên hero
       if (currentScroll < heroAnimationEnd && traditionalStickyInitialized && traditionalScrollTrigger) {
-        console.log('🔄 User scrolled back to hero, disabling sticky temporarily');
         disableTraditionalSticky();
       }
     }
@@ -561,13 +550,11 @@ function monitorHeroScrollCompletion() {
 }
 
 function initTraditionalStickyScroll() {
-  // Kiểm tra xem user có đang trong quá trình hero scroll không
   const viewportHeight = window.innerHeight;
   const heroAnimationEnd = viewportHeight * 0.5;
   const currentScroll = window.pageYOffset;
   
   if (currentScroll < heroAnimationEnd) {
-    console.log('⏳ Still in hero area, postponing sticky init');
     traditionalStickyInitialized = false;
     return;
   }
@@ -576,15 +563,10 @@ function initTraditionalStickyScroll() {
   const productWrapper = traditionalSection?.querySelector('.kpr-product-wrapper');
   const productCards = traditionalSection?.querySelectorAll('.kpr-product-card');
   
-  // Validation
   if (!traditionalSection || !productWrapper || !productCards.length) {
-    console.log('🔍 Traditional sticky: Required elements not found');
     return;
   }
   
-  console.log('✅ Traditional sticky initialized with', productCards.length, 'products');
-  
-  // Calculate scroll distance
   const calculateScrollDistance = () => {
     const viewportHeight = window.innerHeight;
     const totalCardsHeight = Array.from(productCards).reduce((total, card) => {
@@ -594,10 +576,10 @@ function initTraditionalStickyScroll() {
     return Math.max(totalCardsHeight - viewportHeight + 300, 500);
   };
   
-  // Set performance styles
+  // Set overflow visible for floating effect
   gsap.set(productWrapper, {
     position: 'relative',
-    overflow: 'hidden'
+    overflow: 'visible'
   });
   
   gsap.set(productCards, {
@@ -613,11 +595,11 @@ function initTraditionalStickyScroll() {
     ease: 'none',
   });
   
-  // Create ScrollTrigger với logic tránh conflict
+  // Create ScrollTrigger với start position cao hơn 15%
   traditionalScrollTrigger = ScrollTrigger.create({
     id: 'traditional-sticky',
     trigger: traditionalSection,
-    start: 'top top',
+    start: 'top+=15% top', // Sticky cao hơn 15% viewport
     end: () => {
       const scrollDistance = calculateScrollDistance();
       return `+=${scrollDistance * 2}`;
@@ -628,21 +610,30 @@ function initTraditionalStickyScroll() {
     anticipatePin: 1,
     animation: traditionalTl,
     
-    onEnter: () => {
-      console.log('🔒 Traditional section pinned');
-    },
-    
-    onLeave: () => {
-      console.log('🔓 Traditional section unpinned');
-    },
-    
     onUpdate: (self) => {
       const progress = Math.round(self.progress * 100);
       updateTraditionalProgress(progress);
     },
     
-    // Thấp priority để không conflict với smooth scroll
     refreshPriority: -2,
+  });
+  
+  // Floating effect for each product card
+  productCards.forEach((card, index) => {
+    ScrollTrigger.create({
+      trigger: card,
+      start: 'bottom center',
+      end: 'bottom top-=100',
+      scrub: 1,
+      animation: gsap.to(card, {
+        y: -200, // Float up
+        opacity: 0.3,
+        scale: 0.8,
+        duration: 1,
+        ease: 'none'
+      }),
+      id: `traditional-float-${index}`,
+    });
   });
   
   // Handle resize
@@ -652,7 +643,9 @@ function initTraditionalStickyScroll() {
     resizeTimeout = setTimeout(() => {
       if (traditionalScrollTrigger) {
         traditionalScrollTrigger.refresh();
-        console.log('🔄 Traditional sticky refreshed');
+        productCards.forEach((card, index) => {
+          ScrollTrigger.getById(`traditional-float-${index}`)?.refresh();
+        });
       }
     }, 150);
   });
@@ -662,41 +655,37 @@ function disableTraditionalSticky() {
   if (traditionalScrollTrigger) {
     traditionalScrollTrigger.kill();
     traditionalScrollTrigger = null;
-    console.log('❌ Traditional sticky disabled');
+    
+    // Kill floating effects
+    const productCards = document.querySelectorAll('#traditional-section .kpr-product-card');
+    productCards.forEach((card, index) => {
+      ScrollTrigger.getById(`traditional-float-${index}`)?.kill();
+    });
   }
   traditionalStickyInitialized = false;
 }
 
 // Override existing scrollToSection để compatible
-// Backup original function nếu có
 const originalScrollToSection = window.scrollToSection;
 
 window.scrollToSection = function(targetId) {
-  console.log('📍 Scrolling to section:', targetId);
-  
-  // Temporarily disable sticky scroll during navigation
   if (traditionalScrollTrigger && targetId === 'traditional-section') {
-    console.log('⏸️ Temporarily disabling sticky for smooth navigation');
     disableTraditionalSticky();
     
-    // Re-enable after scroll completion
     setTimeout(() => {
       if (window.pageYOffset > window.innerHeight * 0.5) {
-        traditionalStickyInitialized = false; // Reset flag
+        traditionalStickyInitialized = false;
         setTimeout(() => initTraditionalStickyScroll(), 500);
       }
-    }, 3000); // Wait for scroll animation to complete
+    }, 3000);
   }
   
-  // Call original function nếu có
   if (originalScrollToSection) {
     return originalScrollToSection(targetId);
   }
   
-  // Fallback sử dụng logic gốc của bạn
   const targetElement = document.getElementById(targetId);
   if (!targetElement) {
-    console.warn("Target element not found:", targetId);
     return;
   }
 
@@ -706,8 +695,6 @@ window.scrollToSection = function(targetId) {
                      document.querySelector(".hero-section");
   const viewportHeight = window.innerHeight;
   const heroAnimationEnd = viewportHeight * 0.5;
-
-  console.log("Scrolling from:", currentScroll, "to:", targetScroll);
 
   const targetElements = targetElement.querySelectorAll(
     "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
@@ -810,16 +797,10 @@ window.addEventListener("load", () => {
   }, 200);
 });
 
-// ===========================================
-// 10. UTILITY FUNCTIONS
-// ===========================================
-
+// Utility functions
 window.refreshTraditionalScroll = function() {
   if (traditionalScrollTrigger) {
     traditionalScrollTrigger.refresh();
-    console.log('🔄 Traditional scroll refreshed');
-  } else {
-    console.log('❌ Traditional ScrollTrigger not active');
   }
 };
 
