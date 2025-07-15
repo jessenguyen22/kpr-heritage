@@ -326,7 +326,7 @@ window.addEventListener("load", () => {
   ScrollTrigger.refresh();
 
   // Create animations for sections
-  createSectionAnimation("traditional-section");
+
   createSectionAnimation("hybrid-section");
   createSectionAnimation("modern-section");
 });
