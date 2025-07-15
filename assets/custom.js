@@ -96,41 +96,84 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => loadTl.play(), 1000);
   }
 
-  // 2. HERO SECTION MASK ANIMATION
-  const heroTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: ".hero-section",
-      start: "top top",
-      end: "+=50%",
-      scrub: 2.5,
-      pin: true,
-      onUpdate: (self) => {
-        if (self.progress > 0.1) {
-          allowHover = false;
-          if (typeof gifCursor !== "undefined") {
-            gifCursor.style.display = "none";
-            document.body.style.cursor = "default";
-          }
-        } else {
-          allowHover = true;
+ // 2. ENHANCED HERO SECTION MASK ANIMATION
+const heroTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: ".hero-section",
+    start: "top top",
+    end: "+=50%",
+    scrub: 2.5,
+    pin: true,
+    onUpdate: (self) => {
+      if (self.progress > 0.1) {
+        allowHover = false;
+        if (typeof gifCursor !== "undefined") {
+          gifCursor.style.display = "none";
+          document.body.style.cursor = "default";
         }
-      },
+      } else {
+        allowHover = true;
+      }
     },
-  });
+  },
+});
 
-  heroTl.fromTo(
-    ".mask-wrapper",
-    {
-      maskPosition: "49% center",
-      maskSize: "4100% 4100%",
-    },
-    {
-      maskPosition: "50% center",
-      maskSize: "15% 15%",
-      duration: 1,
-    }
-  );
+// Create white overlay if not exists
+let whiteOverlay = document.querySelector('.hero-white-overlay');
+if (!whiteOverlay) {
+  whiteOverlay = document.createElement('div');
+  whiteOverlay.className = 'hero-white-overlay';
+  whiteOverlay.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0);
+    pointer-events: none;
+    z-index: 2;
+  `;
+  document.querySelector('.hero-section').appendChild(whiteOverlay);
+}
 
+// Enhanced timeline with multiple effects
+heroTl
+  // Mask animation (original)
+  .fromTo(".mask-wrapper", {
+    maskPosition: "49% center",
+    maskSize: "4100% 4100%",
+  }, {
+    maskPosition: "50% center",
+    maskSize: "15% 15%",
+    duration: 1,
+  })
+  
+  // Scale down section and elements
+  .fromTo(".hero-section", {
+    scale: 1,
+  }, {
+    scale: 0.95, // Thu nhỏ 5%
+    duration: 1,
+    ease: "power2.out",
+  }, 0) // Start cùng lúc với mask
+  
+  // Scale down internal elements
+  .fromTo(".hero-section .traditional-img, .hero-section .modern-img, .hero-section .hybrid-img", {
+    scale: 1,
+  }, {
+    scale: 0.9, // Thu nhỏ 10%
+    duration: 1,
+    ease: "power2.out",
+  }, 0.2) // Delay nhỏ để tạo depth
+  
+  // White overlay fade in
+  .fromTo(whiteOverlay, {
+    opacity: 0,
+  }, {
+    opacity: 0.3, // 30% opacity white overlay
+    duration: 1,
+    ease: "power2.inOut",
+  }, 0.3); // Start sau một chút
   // 3. CUSTOM GIF CURSOR
   const gifCursor = document.createElement("div");
   gifCursor.innerHTML = `<img src="https://cdn.shopify.com/s/files/1/0580/6994/2352/files/button5_blue_1.gif?v=1752294330">`;
