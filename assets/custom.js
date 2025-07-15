@@ -505,276 +505,39 @@ window.addEventListener("load", () => {
 
 
 // ===========================================
-// 9. STICKY PRODUCT SCROLL FOR TRADITIONAL SECTION
+// 9. SIMPLE STICKY SCROLL FOR TRADITIONAL SECTION
 // ===========================================
 
-let traditionalStickyInitialized = false;
-let traditionalScrollTrigger = null;
-
 window.addEventListener("load", () => {
-  monitorHeroScrollCompletion();
+  setTimeout(initTraditionalSticky, 300);
 });
 
-function monitorHeroScrollCompletion() {
-  const heroSection = document.querySelector(".hero-section.mask-wrapper") || 
-                     document.querySelector(".hero-section");
+function initTraditionalSticky() {
+  const section = document.getElementById('traditional-section');
+  const wrapper = section?.querySelector('.kpr-product-wrapper');
+  const cards = section?.querySelectorAll('.kpr-product-card');
   
-  if (!heroSection) {
-    setTimeout(() => initTraditionalStickyScroll(), 100);
-    return;
-  }
+  if (!section || !wrapper || !cards.length) return;
   
-  const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5;
+  // Calculate scroll distance
+  const scrollDistance = cards.length * 500;
   
-  ScrollTrigger.create({
-    trigger: "body",
-    start: 0,
-    end: "max",
-    onUpdate: (self) => {
-      const currentScroll = window.pageYOffset;
-      
-      if (currentScroll > heroAnimationEnd + 100 && !traditionalStickyInitialized) {
-        traditionalStickyInitialized = true;
-        setTimeout(() => {
-          initTraditionalStickyScroll();
-        }, 200);
-      }
-      
-      if (currentScroll < heroAnimationEnd && traditionalStickyInitialized && traditionalScrollTrigger) {
-        disableTraditionalSticky();
-      }
-    }
-  });
-}
-
-function initTraditionalStickyScroll() {
-  const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5;
-  const currentScroll = window.pageYOffset;
-  
-  if (currentScroll < heroAnimationEnd) {
-    traditionalStickyInitialized = false;
-    return;
-  }
-  
-  const traditionalSection = document.getElementById('traditional-section');
-  const productWrapper = traditionalSection?.querySelector('.kpr-product-wrapper');
-  const productCards = traditionalSection?.querySelectorAll('.kpr-product-card');
-  
-  if (!traditionalSection || !productWrapper || !productCards.length) {
-    return;
-  }
-  
-  const calculateScrollDistance = () => {
-    const viewportHeight = window.innerHeight;
-    const totalCardsHeight = Array.from(productCards).reduce((total, card) => {
-      return total + card.offsetHeight + 30;
-    }, 0);
-    
-    return Math.max(totalCardsHeight - viewportHeight + 300, 500);
-  };
-  
-  gsap.set(productWrapper, {
-    position: 'relative',
-    overflow: 'hidden'
-  });
-  
-  gsap.set(productCards, {
-    willChange: 'transform'
-  });
-  
-  const traditionalTl = gsap.timeline();
-  
-  traditionalTl.to(productCards, {
-    y: () => -calculateScrollDistance(),
+  // Timeline for product scrolling
+  const tl = gsap.timeline();
+  tl.to(cards, {
+    y: -scrollDistance,
     duration: 1,
-    ease: 'none',
+    ease: 'none'
   });
   
-  traditionalScrollTrigger = ScrollTrigger.create({
-    id: 'traditional-sticky',
-    trigger: traditionalSection,
+  // Pin section and scroll products
+  ScrollTrigger.create({
+    trigger: section,
     start: 'top top',
-    end: () => {
-      const scrollDistance = calculateScrollDistance();
-      return `+=${scrollDistance * 2}`;
-    },
+    end: `+=${scrollDistance}`,
     pin: true,
-    pinSpacing: true,
-    scrub: 1.5,
-    anticipatePin: 1,
-    animation: traditionalTl,
-    
-    onUpdate: (self) => {
-      const progress = Math.round(self.progress * 100);
-      updateTraditionalProgress(progress);
-    },
-    
-    refreshPriority: -2,
-  });
-  
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      if (traditionalScrollTrigger) {
-        traditionalScrollTrigger.refresh();
-      }
-    }, 150);
+    scrub: 1,
+    animation: tl
   });
 }
-
-function disableTraditionalSticky() {
-  if (traditionalScrollTrigger) {
-    traditionalScrollTrigger.kill();
-    traditionalScrollTrigger = null;
-  }
-  traditionalStickyInitialized = false;
-}
-
-const originalScrollToSection = window.scrollToSection;
-
-window.scrollToSection = function(targetId) {
-  if (traditionalScrollTrigger && targetId === 'traditional-section') {
-    disableTraditionalSticky();
-    
-    setTimeout(() => {
-      if (window.pageYOffset > window.innerHeight * 0.5) {
-        traditionalStickyInitialized = false;
-        setTimeout(() => initTraditionalStickyScroll(), 500);
-      }
-    }, 3000);
-  }
-  
-  if (originalScrollToSection) {
-    return originalScrollToSection(targetId);
-  }
-  
-  const targetElement = document.getElementById(targetId);
-  if (!targetElement) {
-    return;
-  }
-
-  const currentScroll = window.pageYOffset;
-  const targetScroll = targetElement.offsetTop;
-  const heroSection = document.querySelector(".hero-section.mask-wrapper") || 
-                     document.querySelector(".hero-section");
-  const viewportHeight = window.innerHeight;
-  const heroAnimationEnd = viewportHeight * 0.5;
-
-  const targetElements = targetElement.querySelectorAll(
-    "img, h1, h2, h3, p, .btn, .card, .xb-image, .xb-column"
-  );
-  gsap.set(targetElements, { opacity: 0, y: 30 });
-
-  const scrollTl = gsap.timeline();
-
-  if (currentScroll < heroAnimationEnd) {
-    scrollTl
-      .to(window, {
-        scrollTo: { y: heroAnimationEnd + 50 },
-        duration: 0.3,
-        ease: "power3.out",
-      })
-      .to({}, { duration: 0.3 })
-      .to(window, {
-        scrollTo: { y: targetScroll },
-        duration: 1.5,
-        ease: "power2.out",
-      })
-      .to(targetElements, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out",
-      }, "-=0.5");
-  } else {
-    scrollTl
-      .to(window, {
-        scrollTo: { y: targetScroll },
-        duration: 2,
-        ease: "power2.inOut",
-      })
-      .to(targetElements, {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: "power2.out",
-      }, "-=0.3");
-  }
-};
-
-function createTraditionalProgress() {
-  if (document.querySelector('.traditional-progress')) return;
-  
-  const progressHTML = `
-    <div class="traditional-progress" style="
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: rgba(18, 185, 57, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 8px 16px;
-      border-radius: 20px;
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      z-index: 9998;
-      display: none;
-      border: 1px solid rgba(255,255,255,0.1);
-    ">
-      <div style="margin-bottom: 3px;">TRADITIONAL PRODUCTS</div>
-      <div style="width: 120px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 1px; overflow: hidden;">
-        <div class="traditional-progress-fill" style="
-          height: 100%;
-          background: white;
-          border-radius: 1px;
-          width: 0%;
-          transition: width 0.1s ease;
-        "></div>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', progressHTML);
-}
-
-function updateTraditionalProgress(progress) {
-  const progressBar = document.querySelector('.traditional-progress');
-  const progressFill = document.querySelector('.traditional-progress-fill');
-  
-  if (progressBar && progressFill) {
-    if (progress > 5 && progress < 95) {
-      progressBar.style.display = 'block';
-      progressFill.style.width = `${progress}%`;
-    } else {
-      progressBar.style.display = 'none';
-    }
-  }
-}
-
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    createTraditionalProgress();
-  }, 200);
-});
-
-window.refreshTraditionalScroll = function() {
-  if (traditionalScrollTrigger) {
-    traditionalScrollTrigger.refresh();
-  }
-};
-
-window.resetTraditionalScroll = function() {
-  disableTraditionalSticky();
-  traditionalStickyInitialized = false;
-  setTimeout(() => {
-    if (window.pageYOffset > window.innerHeight * 0.5) {
-      initTraditionalStickyScroll();
-    }
-  }, 100);
-};
 
