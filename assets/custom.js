@@ -332,184 +332,15 @@ window.addEventListener("load", () => {
 });
 
 
-// ===========================================
-// 9. STICKY PRODUCT SCROLL FOR TRADITIONAL SECTION
-// Thêm vào cuối file GSAP hiện tại
-// ===========================================
 
-window.addEventListener("load", () => {
-  // Đợi tất cả ScrollTrigger khác initialize xong
-  setTimeout(() => {
-    initTraditionalStickyScroll();
-  }, 100);
-});
-
-function initTraditionalStickyScroll() {
-  const traditionalSection = document.getElementById('traditional-section');
-  const productWrapper = traditionalSection?.querySelector('.kpr-product-wrapper');
-  const productCards = traditionalSection?.querySelectorAll('.kpr-product-card');
-  
-  // Validation
-  if (!traditionalSection || !productWrapper || !productCards.length) {
-    console.log('🔍 Traditional sticky scroll: Required elements not found');
-    return;
-  }
-  
-  console.log('✅ Traditional sticky scroll initialized with', productCards.length, 'products');
-  
-  // Calculate scroll distance based on content
-  const calculateScrollDistance = () => {
-    const viewportHeight = window.innerHeight;
-    const totalCardsHeight = Array.from(productCards).reduce((total, card) => {
-      return total + card.offsetHeight + 30; // 30px gap
-    }, 0);
-    
-    // Ensure enough distance to scroll through all products
-    return Math.max(totalCardsHeight - viewportHeight + 300, 500);
-  };
-  
-  // Set initial styles cho performance
-  gsap.set(productWrapper, {
-    position: 'relative',
-    overflow: 'hidden'
-  });
-  
-  gsap.set(productCards, {
-    willChange: 'transform'
-  });
-  
-  // Create sticky timeline
-  const traditionalTl = gsap.timeline({
-    scrollTrigger: {
-      id: 'traditional-sticky', // Unique ID để không conflict
-      trigger: traditionalSection,
-      start: 'top top',
-      end: () => {
-        const scrollDistance = calculateScrollDistance();
-        return `+=${scrollDistance * 2}`; // 2x multiplier cho smooth scroll
-      },
-      pin: true,
-      pinSpacing: true,
-      scrub: 1.5, // Smooth scrub
-      anticipatePin: 1,
-      
-      // Callbacks để debug
-      onEnter: () => {
-        console.log('🔒 Traditional section pinned');
-        // Optional: Disable allowHover nếu muốn
-        // window.allowHover = false;
-      },
-      
-      onLeave: () => {
-        console.log('🔓 Traditional section unpinned');
-        // window.allowHover = true;
-      },
-      
-      onUpdate: (self) => {
-        // Optional: Update progress
-        const progress = Math.round(self.progress * 100);
-        updateTraditionalProgress(progress);
-      },
-      
-      // Tránh conflict với animations khác
-      refreshPriority: -1,
-    }
-  });
-  
-  // Animate products moving up
-  traditionalTl.to(productCards, {
-    y: () => -calculateScrollDistance(),
-    duration: 1,
-    ease: 'none',
-    stagger: 0, // Move all together
-  });
-  
-  // Optional: Add subtle parallax cho background elements
-  const bgElements = traditionalSection.querySelectorAll('.xb-image img');
-  if (bgElements.length > 0) {
-    traditionalTl.to(bgElements, {
-      y: -100,
-      duration: 1,
-      ease: 'none',
-    }, 0); // Start at same time
-  }
-  
-  // Handle resize without affecting other ScrollTriggers
-  let traditionalResizeTimeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(traditionalResizeTimeout);
-    traditionalResizeTimeout = setTimeout(() => {
-      // Only refresh traditional sticky ScrollTrigger
-      ScrollTrigger.getById('traditional-sticky')?.refresh();
-      console.log('🔄 Traditional sticky refreshed');
-    }, 150);
-  });
-}
-
-// Optional: Progress indicator chỉ cho traditional section
-function createTraditionalProgress() {
-  if (document.querySelector('.traditional-progress')) return;
-  
-  const progressHTML = `
-    <div class="traditional-progress" style="
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: rgba(18, 185, 57, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 8px 16px;
-      border-radius: 20px;
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      z-index: 9998;
-      display: none;
-      border: 1px solid rgba(255,255,255,0.1);
-    ">
-      <div style="margin-bottom: 3px;">TRADITIONAL PRODUCTS</div>
-      <div style="width: 120px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 1px; overflow: hidden;">
-        <div class="traditional-progress-fill" style="
-          height: 100%;
-          background: white;
-          border-radius: 1px;
-          width: 0%;
-          transition: width 0.1s ease;
-        "></div>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', progressHTML);
-}
-
-function updateTraditionalProgress(progress) {
-  const progressBar = document.querySelector('.traditional-progress');
-  const progressFill = document.querySelector('.traditional-progress-fill');
-  
-  if (progressBar && progressFill) {
-    if (progress > 5 && progress < 95) {
-      progressBar.style.display = 'block';
-      progressFill.style.width = `${progress}%`;
-    } else {
-      progressBar.style.display = 'none';
-    }
-  }
-}
-
-// Initialize progress bar
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    createTraditionalProgress();
-  }, 200);
-});
 
 
 // ===========================================
-// 9. SIMPLE STICKY SCROLL FOR TRADITIONAL SECTION
+// 9. SIMPLE STICKY SCROLL FOR TRADITIONAL SECTION - CLEAN VERSION
 // ===========================================
 
 window.addEventListener("load", () => {
-  setTimeout(initTraditionalSticky, 300);
+  setTimeout(initTraditionalSticky, 500);
 });
 
 function initTraditionalSticky() {
@@ -537,7 +368,8 @@ function initTraditionalSticky() {
     end: `+=${scrollDistance}`,
     pin: true,
     scrub: 1,
-    animation: tl
+    animation: tl,
+    id: 'traditional-simple-sticky'
   });
 }
 
