@@ -110,19 +110,23 @@ if (!whiteOverlay) {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0);
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
   `;
   
-  // Find video wrapper and insert overlay right after it
+  // Insert overlay INSIDE video wrapper to match height
   const videoWrapper = document.querySelector('.kpr-video-wrapper');
   
   if (videoWrapper) {
-    videoWrapper.insertAdjacentElement('afterend', whiteOverlay);
-    console.log('✅ White overlay created after video wrapper');
+    videoWrapper.appendChild(whiteOverlay);
+    console.log('✅ White overlay created inside video wrapper');
   }
 }
+
+// Set initial states with GSAP
+gsap.set('.hero-white-overlay', {
+  background: 'rgba(255, 255, 255, 0)', // Transparent initially
+});
 
 // NOW create timeline with overlay included
 const heroTl = gsap.timeline({
@@ -177,11 +181,11 @@ heroTl
     ease: "power2.out",
   }, 0.2)
   
-  // White overlay fade in - now overlay exists!
+  // White overlay fade in with GSAP background animation
   .fromTo('.hero-white-overlay', {
-    opacity: 0,
+    background: 'rgba(255, 255, 255, 0)', // From transparent
   }, {
-    opacity: 0.3,
+    background: 'rgba(255, 255, 255, 0.3)', // To 30% white
     duration: 1,
     ease: "power2.inOut",
   }, 0.3);
