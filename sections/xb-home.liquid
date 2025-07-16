@@ -46,44 +46,111 @@
   class="xb-wrapper id_mczvi0hf13qk1" style="--xb-wld:column;--xb-wvsd:15px;--xb-whsd:15px;--xb-wvst:15px;--xb-wvsm:15px;--xb-whst:15px;--xb-whsm:15px;--xb-wwd:100%;--xb-wwt:100%;--xb-wwm:100%;--xb-wvad:none;--xb-wvat:none;--xb-wvam:none;--xb-wmhd:300px;--xb-wmht:300px;--xb-wmhm:300px;--xb-whad:start;--xb-what:start;--xb-wham:start;--xb-wwrd:wrap;--xb-wwrt:wrap;--xb-wwrm:wrap;--xb-wz:1;--xb-wpt:relative;"   
   
 >
-  <div class="xb-freedom xb-freedom-alignment " style="--xb-fzi:99;--xb-fwd:81.11%;--xb-fhd:92.15%;--xb-fxd:6.16%;--xb-fyd:9.48%;--xb-fad:0deg;--xb-fard:0.8801953336950623;--xb-fwt:81.11%;--xb-fht:92.15%;--xb-fxt:6.16%;--xb-fyt:9.48%;--xb-fat:0deg;--xb-fart:0.8801953336950623;--xb-fwm:81.11%;--xb-fhm:92.15%;--xb-fxm:6.16%;--xb-fym:9.48%;--xb-fam:0deg;--xb-farm:0.8801953336950623;--xb-fhad:start;--xb-fhat:start;--xb-fham:start;--xb-fvad:start;--xb-fvat:start;--xb-fvam:start;">
+  <div class="xb-freedom xb-freedom-alignment " style="--xb-fzi:99;--xb-fwd:81.11%;--xb-fhd:184.58%;--xb-fxd:6.16%;--xb-fyd:9.43%;--xb-fad:0deg;--xb-fard:0.4394300574276736;--xb-fwt:81.11%;--xb-fht:184.58%;--xb-fxt:6.16%;--xb-fyt:9.43%;--xb-fat:0deg;--xb-fart:0.4394300574276736;--xb-fwm:81.11%;--xb-fhm:184.58%;--xb-fxm:6.16%;--xb-fym:9.43%;--xb-fam:0deg;--xb-farm:0.4394300574276736;--xb-fhad:start;--xb-fhat:start;--xb-fham:start;--xb-fvad:start;--xb-fvat:start;--xb-fvam:start;">
   <div class="xb-freedom__inner">
-    <div class="xb-freedom__content"><a
-  class="xb-image xb-link traditional-img id_mczvi0hf153nn" style="--xb-image-width-desktop:100%;--xb-image-width-tablet:100%;--xb-image-width-mobile:100%;--xb-image-caption-background-color:#000000;--xb-image-aspect-ratio-desktop:1054 / 1122;--xb-image-aspect-ratio-tablet:1054 / 1122;--xb-image-aspect-ratio-mobile:1054 / 1122;--xb-image-object-fit:cover;"  href="#traditional-section" 
+    <div class="xb-freedom__content">
+<div
+  class="xb-custom-code id_md5qs7z940ivu"   
 >
+  <!-- Lottie Animation with Hover Effect -->
+<div class="lottie-interactive-container" style="position: relative; width: 100%; height: 600px; cursor: pointer;">
+  <!-- Lottie Container -->
+  <div id="tiger-lottie" style="width: 100%; height: 100%;"></div>
   
-  <div 
-    class="xb-image__static" 
-    style="position: relative;--xb-image-mask-svg: url('https://cdn.shopify.com/s/files/1/0677/7900/2622/files/Mask_Abstract_1.svg?v=1712119221')"
-  >
-    
-  <img
-    class="xb-image__img"
-    is='xo-lazyload'
-    xo-src='https://cdn.shopify.com/s/files/1/0580/6994/2352/files/left-tiger.webp?v=1752030784'
-    loading='lazy'
-    alt=""
-    width='1054'
-    height='1122'
-    xo-intrinsic-width='1054'
-    xo-intrinsic-height='1122'
-    xo-fallback-width='1200'
-    draggable="false"
-  />
+  <!-- Custom Cursor Text -->
+  <div id="lottie-cursor" style="
+    position: fixed;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  ">VIEW MORE</div>
+</div>
 
-    
-        <div class="xb-image__overlay xo-lazyload-overlay">
-          <div class="xb-image__loading" style="--xb-image-loading-background: rgba(0, 0, 0, 0)">
-            <div
-              class="xo-loader-2"
-              style="--color: rgba(0, 0, 0, 1); --duration: 1300;--stroke-width: 2;--size: 10;"
-            ><div><span></span></div></div>
-          </div>
-        </div>
-        
-  </div>
-  
-</a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<script>
+(function() {
+  // Wait for Lottie library to load
+  if (typeof lottie === 'undefined') {
+    setTimeout(arguments.callee, 100);
+    return;
+  }
+
+  const tigerAnimation = lottie.loadAnimation({
+    container: document.getElementById('tiger-lottie'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'https://cdn.shopify.com/s/files/1/0580/6994/2352/files/Tiger.json?v=1752657585'
+  });
+
+  const container = document.querySelector('.lottie-interactive-container');
+  const cursor = document.getElementById('lottie-cursor');
+  let isHovering = false;
+
+  // Set gentle movement when not hovering
+  tigerAnimation.addEventListener('DOMLoaded', function() {
+    tigerAnimation.setSpeed(0.3); // Slow gentle movement
+  });
+
+  // Hover events
+  container.addEventListener('mouseenter', function() {
+    isHovering = true;
+    tigerAnimation.setSpeed(1); // Normal speed on hover
+    cursor.style.display = 'block';
+    container.style.cursor = 'none';
+  });
+
+  container.addEventListener('mouseleave', function() {
+    isHovering = false;
+    tigerAnimation.setSpeed(0.3); // Back to gentle movement
+    cursor.style.display = 'none';
+    container.style.cursor = 'pointer';
+  });
+
+  // Mouse move for custom cursor
+  container.addEventListener('mousemove', function(e) {
+    if (isHovering) {
+      cursor.style.left = e.clientX + 15 + 'px';
+      cursor.style.top = e.clientY - 15 + 'px';
+    }
+  });
+
+  // Optional: Click action
+  container.addEventListener('click', function() {
+    // Add your click action here
+    console.log('Tiger animation clicked!');
+    // Example: window.location.href = '/traditional-collection';
+  });
+})();
+</script>
+
+<style>
+.lottie-interactive-container {
+  transition: transform 0.3s ease;
+}
+
+.lottie-interactive-container:hover {
+  transform: scale(1.02);
+}
+
+#lottie-cursor {
+  animation: cursorPulse 2s infinite;
+}
+
+@keyframes cursorPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+</style>
+</div>
 </div>
   </div>
 </div>
