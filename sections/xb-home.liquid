@@ -53,10 +53,10 @@
   class="xb-custom-code traditional-img id_md5qs7z940ivu"   
 >
   <!-- Lottie Animation with Hover Effect -->
-<div href="#tradtional-section" class="lottie-interactive-container" style="position: relative; width: 100%; height: 550px; cursor: pointer;">
+<a href="#traditional-section" class="lottie-interactive-container" style="position: relative; width: 100%; height: 550px; cursor: pointer; display: block; text-decoration: none;">
   <!-- Lottie Container -->
-  <div id="tiger-lottie" style="width: 100%; height: 100% ;"></div>
-</div>
+  <div id="tiger-lottie" style="width: 100%; height: 100%;"></div>
+</a>
 
 <script>
 (function() {
@@ -65,7 +65,7 @@
     setTimeout(arguments.callee, 100);
     return;
   }
-
+  
   const tigerAnimation = lottie.loadAnimation({
     container: document.getElementById('tiger-lottie'),
     renderer: 'svg',
@@ -73,43 +73,33 @@
     autoplay: false,
     path: 'https://cdn.shopify.com/s/files/1/0580/6994/2352/files/Tiger.json?v=1752657585'
   });
-
+  
   const container = document.querySelector('.lottie-interactive-container');
   let isHovering = false;
-
+  
   // Wait for animation to load then STOP completely
   tigerAnimation.addEventListener('DOMLoaded', function() {
-    tigerAnimation.goToAndStop(0, true); // Stay at frame 0
+    tigerAnimation.goToAndStop(0, true);
     console.log('Tiger animation loaded - staying idle');
   });
-
+  
   // Hover events
   container.addEventListener('mouseenter', function() {
     isHovering = true;
-    
-    // Play full animation from start
     tigerAnimation.goToAndStop(0, true);
     tigerAnimation.play();
-    
     console.log('Hover started - playing full animation');
   });
-
+  
   container.addEventListener('mouseleave', function() {
     isHovering = false;
-    
-    // Stop animation and return to frame 0
     tigerAnimation.stop();
     tigerAnimation.goToAndStop(0, true);
-    
     console.log('Hover ended - back to static');
   });
-
-  // Click action
-  container.addEventListener('click', function() {
-    console.log('Tiger animation clicked!');
-    // Add your click action here
-  });
-
+  
+  // Remove the manual click handler since <a> tag handles navigation
+  
   // Cleanup
   window.addEventListener('beforeunload', function() {
     tigerAnimation.destroy();
@@ -125,7 +115,7 @@
 
 .lottie-interactive-container:hover {
   transform: scale(1.05);
-  animation: none; /* Stop breathing animation on hover */
+  animation: none;
 }
 
 @keyframes subtleBreathing {
