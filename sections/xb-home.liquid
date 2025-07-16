@@ -53,7 +53,7 @@
   class="xb-custom-code id_md5qs7z940ivu"   
 >
   <!-- Lottie Animation with Hover Effect -->
-<div class="lottie-interactive-container" style="position: relative; width: 100%; height: 400px; cursor: pointer;">
+<div class="lottie-interactive-container" style="position: relative; width: 100%; height: 550px; cursor: pointer;">
   <!-- Lottie Container -->
   <div id="tiger-lottie" style="width: 100%; height: 100%;"></div>
   
@@ -94,38 +94,18 @@
   const container = document.querySelector('.lottie-interactive-container');
   const cursor = document.getElementById('lottie-cursor');
   let isHovering = false;
-  let idleAnimation;
 
-  // Wait for animation to load
+  // Wait for animation to load then STOP completely
   tigerAnimation.addEventListener('DOMLoaded', function() {
-    console.log('Tiger animation loaded');
-    startIdleAnimation();
+    tigerAnimation.goToAndStop(0, true); // Stay at frame 0
+    console.log('Tiger animation loaded - staying idle');
   });
-
-  // Function to create subtle idle movement
-  function startIdleAnimation() {
-    // Play just the first few frames slowly
-    tigerAnimation.goToAndStop(0, true);
-    
-    idleAnimation = setInterval(function() {
-      if (!isHovering) {
-        // Animate between frame 0-10 slowly for subtle movement
-        const currentFrame = tigerAnimation.currentFrame;
-        if (currentFrame >= 10) {
-          tigerAnimation.goToAndStop(0, true);
-        } else {
-          tigerAnimation.goToAndStop(currentFrame + 0.5, true);
-        }
-      }
-    }, 100); // Update every 100ms for smooth movement
-  }
 
   // Hover events
   container.addEventListener('mouseenter', function() {
     isHovering = true;
-    clearInterval(idleAnimation); // Stop idle animation
     
-    // Play full animation
+    // Play full animation from start
     tigerAnimation.goToAndStop(0, true);
     tigerAnimation.play();
     
@@ -139,15 +119,15 @@
   container.addEventListener('mouseleave', function() {
     isHovering = false;
     
-    // Stop full animation and return to idle
+    // Stop animation and return to frame 0
     tigerAnimation.stop();
-    startIdleAnimation();
+    tigerAnimation.goToAndStop(0, true);
     
     // Hide custom cursor
     cursor.style.display = 'none';
     container.style.cursor = 'pointer';
     
-    console.log('Hover ended - back to idle');
+    console.log('Hover ended - back to static');
   });
 
   // Mouse move for custom cursor
@@ -162,14 +142,10 @@
   container.addEventListener('click', function() {
     console.log('Tiger animation clicked!');
     // Add your click action here
-    // window.location.href = '/traditional-collection';
   });
 
-  // Cleanup on page unload
+  // Cleanup
   window.addEventListener('beforeunload', function() {
-    if (idleAnimation) {
-      clearInterval(idleAnimation);
-    }
     tigerAnimation.destroy();
   });
 })();
@@ -178,14 +154,31 @@
 <style>
 .lottie-interactive-container {
   transition: transform 0.3s ease;
+  animation: gentleFloat 3s ease-in-out infinite;
 }
 
 .lottie-interactive-container:hover {
   transform: scale(1.02);
+  animation: none; /* Stop float animation on hover */
 }
 
 #lottie-cursor {
   animation: cursorPulse 2s infinite;
+}
+
+@keyframes gentleFloat {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px);
+  }
+  25% { 
+    transform: translateY(-5px) translateX(2px);
+  }
+  50% { 
+    transform: translateY(-3px) translateX(-1px);
+  }
+  75% { 
+    transform: translateY(-7px) translateX(1px);
+  }
 }
 
 @keyframes cursorPulse {
