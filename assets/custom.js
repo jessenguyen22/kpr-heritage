@@ -185,7 +185,7 @@ heroTl
   .fromTo('.hero-white-overlay', {
     background: 'rgba(255, 255, 255, 0)', // From transparent
   }, {
-    background: 'rgba(255, 255, 255, 0.3)', // To 30% white
+    background: 'rgba(255, 255, 255, 1)', // To 30% white
     duration: 1,
     ease: "power2.inOut",
   }, 0.3);
