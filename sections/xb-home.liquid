@@ -50,31 +50,14 @@
   <div class="xb-freedom__inner">
     <div class="xb-freedom__content">
 <div
-  class="xb-custom-code id_md5qs7z940ivu"   
+  class="xb-custom-code traditional-img id_md5qs7z940ivu"   
 >
   <!-- Lottie Animation with Hover Effect -->
 <div class="lottie-interactive-container" style="position: relative; width: 100%; height: 550px; cursor: pointer;">
   <!-- Lottie Container -->
   <div id="tiger-lottie" style="width: 100%; height: 100%;"></div>
-  
-  <!-- Custom Cursor Text -->
-  <div id="lottie-cursor" style="
-    position: fixed;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    pointer-events: none;
-    z-index: 9999;
-    display: none;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  ">VIEW MORE</div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 <script>
 (function() {
   // Wait for Lottie library to load
@@ -86,13 +69,12 @@
   const tigerAnimation = lottie.loadAnimation({
     container: document.getElementById('tiger-lottie'),
     renderer: 'svg',
-    loop: false, // Tắt loop
-    autoplay: false, // Tắt autoplay
+    loop: false,
+    autoplay: false,
     path: 'https://cdn.shopify.com/s/files/1/0580/6994/2352/files/Tiger.json?v=1752657585'
   });
 
   const container = document.querySelector('.lottie-interactive-container');
-  const cursor = document.getElementById('lottie-cursor');
   let isHovering = false;
 
   // Wait for animation to load then STOP completely
@@ -109,10 +91,6 @@
     tigerAnimation.goToAndStop(0, true);
     tigerAnimation.play();
     
-    // Show custom cursor
-    cursor.style.display = 'block';
-    container.style.cursor = 'none';
-    
     console.log('Hover started - playing full animation');
   });
 
@@ -123,19 +101,7 @@
     tigerAnimation.stop();
     tigerAnimation.goToAndStop(0, true);
     
-    // Hide custom cursor
-    cursor.style.display = 'none';
-    container.style.cursor = 'pointer';
-    
     console.log('Hover ended - back to static');
-  });
-
-  // Mouse move for custom cursor
-  container.addEventListener('mousemove', function(e) {
-    if (isHovering) {
-      cursor.style.left = e.clientX + 15 + 'px';
-      cursor.style.top = e.clientY - 15 + 'px';
-    }
   });
 
   // Click action
@@ -153,8 +119,8 @@
 
 <style>
 .lottie-interactive-container {
-  transition: transform 0.3s ease;
-  animation: gentleFloat 3s ease-in-out infinite;
+  transition: transform 0.5s ease;
+  animation: gentleFloat 6s ease-in-out infinite;
 }
 
 .lottie-interactive-container:hover {
@@ -162,28 +128,22 @@
   animation: none; /* Stop float animation on hover */
 }
 
-#lottie-cursor {
-  animation: cursorPulse 2s infinite;
-}
-
 @keyframes gentleFloat {
   0%, 100% { 
     transform: translateY(0px) translateX(0px);
   }
-  25% { 
-    transform: translateY(-5px) translateX(2px);
+  20% { 
+    transform: translateY(-2px) translateX(1px);
   }
-  50% { 
-    transform: translateY(-3px) translateX(-1px);
+  40% { 
+    transform: translateY(-1px) translateX(-0.5px);
   }
-  75% { 
-    transform: translateY(-7px) translateX(1px);
+  60% { 
+    transform: translateY(-3px) translateX(0.5px);
   }
-}
-
-@keyframes cursorPulse {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
+  80% { 
+    transform: translateY(-1px) translateX(-0.8px);
+  }
 }
 </style>
 </div>
