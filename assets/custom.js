@@ -112,7 +112,7 @@ if (!whiteOverlay) {
     height: 100%;
     background: rgba(255, 255, 255, 0);
     pointer-events: none;
-    z-index: -1;
+    z-index: 0;
   `;
   
   // Find video wrapper and insert overlay right after it
