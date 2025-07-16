@@ -190,64 +190,7 @@ heroTl
     ease: "power2.inOut",
   }, 0.3);
 
-  // 3. CUSTOM GIF CURSOR
-  const gifCursor = document.createElement("div");
-  gifCursor.innerHTML = `<img src="https://cdn.shopify.com/s/files/1/0580/6994/2352/files/button5_blue_1.gif?v=1752294330">`;
-  gifCursor.style.cssText = `
-    position: fixed;
-    width: 250px;
-    height: 70px;
-    pointer-events: none;
-    z-index: 9999;
-    display: none;
-  `;
-  document.body.appendChild(gifCursor);
-
-  // 4. HOVER FUNCTIONALITY
-  const targetImages = document.querySelectorAll(
-    ".traditional-img img, .hybrid-img img, .modern-img img"
-  );
-  let loadedCount = 0;
-
-  function enableHover() {
-    document
-      .querySelectorAll(".traditional-img, .hybrid-img, .modern-img")
-      .forEach((img) => {
-        img.addEventListener("mouseenter", () => {
-          if (!allowHover) return;
-          gifCursor.style.display = "block";
-          document.body.style.cursor = "none";
-        });
-
-        img.addEventListener("mouseleave", () => {
-          gifCursor.style.display = "none";
-          document.body.style.cursor = "default";
-        });
-
-        img.addEventListener("mousemove", (e) => {
-          if (!allowHover) return;
-          gifCursor.style.left = e.clientX - 125 + "px";
-          gifCursor.style.top = e.clientY - 35 + "px";
-        });
-      });
-  }
-
-  targetImages.forEach((img) => {
-    if (img.complete) {
-      loadedCount++;
-    } else {
-      img.addEventListener("load", () => {
-        loadedCount++;
-        if (loadedCount === targetImages.length) {
-          enableHover();
-        }
-      });
-    }
-  });
-
-  if (loadedCount === targetImages.length) {
-    enableHover();
-  }
+  
 
   // 5. SMOOTH SCROLL FUNCTIONALITY (UPDATED)
   // Thay thế function scrollToSection cũ bằng cái này
