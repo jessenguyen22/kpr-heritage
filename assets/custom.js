@@ -97,26 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 // 2. ENHANCED HERO SECTION MASK ANIMATION
-const heroTl = gsap.timeline({
-  scrollTrigger: {
-    trigger: ".hero-section",
-    start: "top top",
-    end: "+=50%",
-    scrub: 2.5,
-    pin: true,
-    onUpdate: (self) => {
-      if (self.progress > 0.1) {
-        allowHover = false;
-        if (typeof gifCursor !== "undefined") {
-          gifCursor.style.display = "none";
-          document.body.style.cursor = "default";
-        }
-      } else {
-        allowHover = true;
-      }
-    },
-  },
-});
+// Create overlay FIRST, then timeline
 
 // Create white overlay if not exists
 let whiteOverlay = document.querySelector('.hero-white-overlay');
@@ -136,16 +117,35 @@ if (!whiteOverlay) {
   
   // Find video wrapper and insert overlay right after it
   const videoWrapper = document.querySelector('.kpr-video-wrapper');
-  const heroSection = document.querySelector('.hero-section.mask-wrapper');
   
-  if (videoWrapper && heroSection) {
-    // Insert overlay right after video wrapper
+  if (videoWrapper) {
     videoWrapper.insertAdjacentElement('afterend', whiteOverlay);
     console.log('✅ White overlay created after video wrapper');
-  } else {
-    console.log('❌ Video wrapper or hero section not found');
   }
 }
+
+// NOW create timeline with overlay included
+const heroTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: ".hero-section",
+    start: "top top",
+    end: "+=50%",
+    scrub: 2.5,
+    pin: true,
+    id: 'hero-mask',
+    onUpdate: (self) => {
+      if (self.progress > 0.1) {
+        allowHover = false;
+        if (typeof gifCursor !== "undefined") {
+          gifCursor.style.display = "none";
+          document.body.style.cursor = "default";
+        }
+      } else {
+        allowHover = true;
+      }
+    },
+  },
+});
 
 // Enhanced timeline with multiple effects
 heroTl
@@ -163,28 +163,28 @@ heroTl
   .fromTo(".hero-section", {
     scale: 1,
   }, {
-    scale: 0.95, // Thu nhỏ 5%
+    scale: 0.95,
     duration: 1,
     ease: "power2.out",
-  }, 0) // Start cùng lúc với mask
+  }, 0)
   
   // Scale down internal elements
   .fromTo(".hero-section .traditional-img, .hero-section .modern-img, .hero-section .hybrid-img", {
     scale: 1,
   }, {
-    scale: 0.9, // Thu nhỏ 10%
+    scale: 0.9,
     duration: 1,
     ease: "power2.out",
-  }, 0.2) // Delay nhỏ để tạo depth
+  }, 0.2)
   
-  // White overlay fade in
-  .fromTo(whiteOverlay, {
+  // White overlay fade in - now overlay exists!
+  .fromTo('.hero-white-overlay', {
     opacity: 0,
   }, {
-    opacity: 0.3, // 30% opacity white overlay
+    opacity: 0.3,
     duration: 1,
     ease: "power2.inOut",
-  }, 0.3); // Start sau một chút
+  }, 0.3);
 
   // 3. CUSTOM GIF CURSOR
   const gifCursor = document.createElement("div");
