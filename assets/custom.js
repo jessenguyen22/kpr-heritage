@@ -114,12 +114,12 @@ if (!whiteOverlay) {
     z-index: 1;
   `;
   
-  // Insert overlay INSIDE video wrapper to match height
+  // Insert overlay AFTER video wrapper (cùng cấp) to avoid z-index issues
   const videoWrapper = document.querySelector('.kpr-video-wrapper');
   
   if (videoWrapper) {
-    videoWrapper.appendChild(whiteOverlay);
-    console.log('✅ White overlay created inside video wrapper');
+    videoWrapper.insertAdjacentElement('afterend', whiteOverlay);
+    console.log('✅ White overlay created after video wrapper (same level)');
   }
 }
 
@@ -185,7 +185,7 @@ heroTl
   .fromTo('.hero-white-overlay', {
     background: 'rgba(255, 255, 255, 0)', // From transparent
   }, {
-    background: 'rgba(255, 255, 255, 1)', // To 30% white
+    background: 'rgba(255, 255, 255, 0.3)', // To 30% white
     duration: 1,
     ease: "power2.inOut",
   }, 0.3);
