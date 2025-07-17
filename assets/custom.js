@@ -341,6 +341,50 @@ window.addEventListener("load", () => {
 window.conceptManager = {
   currentSection: null,
   
+  // Initialize hero image clicks
+  init: function() {
+    this.setupHeroClicks();
+    console.log('✅ Concept Manager initialized with hero clicks');
+  },
+  
+  // Setup hero image click handlers
+  setupHeroClicks: function() {
+    // Target images with classes: traditional-img, hybrid-img, modern-img
+    document.querySelectorAll('.traditional-img, .hybrid-img, .modern-img').forEach(img => {
+      img.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default link behavior
+        
+        // Extract section name from class
+        let sectionName = '';
+        if (img.classList.contains('traditional-img')) {
+          sectionName = 'traditional';
+        } else if (img.classList.contains('hybrid-img')) {
+          sectionName = 'hybrid';
+        } else if (img.classList.contains('modern-img')) {
+          sectionName = 'modern';
+        }
+        
+        if (sectionName) {
+          console.log('Hero image clicked:', sectionName);
+          this.showSection(sectionName);
+        }
+      });
+    });
+    
+    // Also handle direct link clicks (fallback)
+    document.querySelectorAll('a[href="#traditional-section"], a[href="#hybrid-section"], a[href="#modern-section"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        const href = link.getAttribute('href');
+        const sectionName = href.replace('#', '').replace('-section', '');
+        
+        console.log('Direct link clicked:', sectionName);
+        this.showSection(sectionName);
+      });
+    });
+  },
+  
   // Show specific concept section
   showSection: function(sectionName) {
     console.log('Showing section:', sectionName);
@@ -354,8 +398,10 @@ window.conceptManager = {
       targetSection.classList.remove('concepts-hidden');
       targetSection.classList.add('concepts-visible', 'concepts-revealing');
       
-      // Scroll to section
-      this.scrollToSection(targetSection);
+      // Scroll to section with delay for animation
+      setTimeout(() => {
+        this.scrollToSection(targetSection);
+      }, 100);
       
       this.currentSection = sectionName;
     }
@@ -384,8 +430,13 @@ window.conceptManager = {
   }
 };
 
-console.log('✅ Concept Manager initialized');
-
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Delay to ensure hero images are loaded
+  setTimeout(() => {
+    window.conceptManager.init();
+  }, 1000);
+});
 
 
 
