@@ -334,19 +334,18 @@ window.addEventListener("load", () => {
 });
 
 // ===========================================
-// FIXED CONCEPT MANAGER WITH PROPER TRANSITION ROUTING
+// DYNAMIC CONCEPT SECTIONS SYSTEM
 // ===========================================
 
-// Enhanced concept manager - REPLACE existing window.conceptManager
+// Global concept manager
 window.conceptManager = {
   currentSection: null,
-  isTransitioning: false,
+  isFirstLoad: true, // Track if it's first load from hero
   
-  // Initialize the system
+  // Initialize hero image clicks
   init: function() {
     this.setupHeroClicks();
-    this.setupNavigationClicks();
-    console.log('✅ Fixed Concept Manager initialized');
+    console.log('✅ Concept Manager initialized with hero clicks');
   },
   
   // Setup hero image click handlers
@@ -354,80 +353,53 @@ window.conceptManager = {
     // Target images with classes: traditional-img, hybrid-img, modern-img
     document.querySelectorAll('.traditional-img, .hybrid-img, .modern-img').forEach(img => {
       img.addEventListener('click', (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent default link behavior
         
-        let sectionName = this.getSectionFromImage(img);
+        // Extract section name from class
+        let sectionName = '';
+        if (img.classList.contains('traditional-img')) {
+          sectionName = 'traditional';
+        } else if (img.classList.contains('hybrid-img')) {
+          sectionName = 'hybrid';
+        } else if (img.classList.contains('modern-img')) {
+          sectionName = 'modern';
+        }
+        
         if (sectionName) {
-          console.log('🎯 Hero image clicked:', sectionName);
-          this.showSection(sectionName, true); // true = from hero
+          console.log('Hero image clicked:', sectionName);
+          this.showSection(sectionName);
         }
       });
     });
     
-    // Handle direct hero links (NOT navigation links)
-    document.querySelectorAll('a[href*="-section"]:not([data-concept-nav])').forEach(link => {
-      // Only handle links that are NOT in concept navigation
-      if (!link.closest('.concept-navigation') && !link.hasAttribute('data-concept-nav')) {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const sectionName = this.getSectionFromHref(link.getAttribute('href'));
-          if (sectionName) {
-            console.log('🎯 Hero direct link clicked:', sectionName);
-            this.showSection(sectionName, true);
-          }
-        });
-      }
-    });
-  },
-  
-  // Setup navigation clicks (NEW - for slide transitions)
-  setupNavigationClicks: function() {
-    // Target navigation links with data-concept-nav
-    document.querySelectorAll('[data-concept-nav]').forEach(navLink => {
-      navLink.addEventListener('click', (e) => {
+    // Also handle direct link clicks (fallback)
+    document.querySelectorAll('a[href="#traditional-section"], a[href="#hybrid-section"], a[href="#modern-section"]').forEach(link => {
+      link.addEventListener('click', (e) => {
         e.preventDefault();
         
-        const sectionName = navLink.getAttribute('data-concept-nav');
-        if (sectionName !== this.currentSection && !this.isTransitioning) {
-          console.log('🔄 Navigation clicked:', sectionName);
-          this.slideToSection(sectionName); // Use slide transition
-        }
+        const href = link.getAttribute('href');
+        const sectionName = href.replace('#', '').replace('-section', '');
+        
+        console.log('Direct link clicked:', sectionName);
+        this.showSection(sectionName);
       });
-      
-      // Add magnetic hover effect
-      navLink.classList.add('concept-nav-magnetic');
     });
   },
   
-  // Helper functions
-  getSectionFromImage: function(img) {
-    if (img.classList.contains('traditional-img')) return 'traditional';
-    if (img.classList.contains('hybrid-img')) return 'hybrid';
-    if (img.classList.contains('modern-img')) return 'modern';
-    return null;
-  },
-  
-  getSectionFromHref: function(href) {
-    return href.replace('#', '').replace('-section', '');
-  },
-  
-  // Show section (for hero clicks - original animation)
-  showSection: function(sectionName, fromHero = false) {
-    console.log(`📍 Showing section: ${sectionName} ${fromHero ? '(from hero)' : ''}`);
+  // Show specific concept section
+  showSection: function(sectionName) {
+    console.log('Showing section:', sectionName);
     
+    // Hide all concept sections
     this.hideAllSections();
     
+    // Show target section
     const targetSection = document.getElementById(`${sectionName}-section`);
     if (targetSection) {
       targetSection.classList.remove('concepts-hidden');
-      targetSection.classList.add('concepts-visible');
+      targetSection.classList.add('concepts-visible', 'concepts-revealing');
       
-      if (fromHero) {
-        targetSection.classList.add('concepts-revealing'); // Original hero animation
-        console.log('✨ Using original hero animation');
-      }
-      
-      // Scroll to section
+      // Scroll to section with delay for animation
       setTimeout(() => {
         this.scrollToSection(targetSection);
       }, 100);
@@ -436,186 +408,7 @@ window.conceptManager = {
     }
   },
   
-  // Slide to section (for navigation clicks - CSS slide animations)
-  slideToSection: function(sectionName) {
-    if (this.isTransitioning) {
-      console.log('⏳ Transition in progress, ignoring click');
-      return;
-    }
-    
-    this.isTransitioning = true;
-    console.log(`🎬 Starting slide transition to: ${sectionName}`);
-    
-    const currentSection = document.getElementById(`${this.currentSection}-section`);
-    const targetSection = document.getElementById(`${sectionName}-section`);
-    
-    if (!currentSection || !targetSection) {
-      console.error('❌ Section not found:', { current: this.currentSection, target: sectionName });
-      this.isTransitioning = false;
-      return;
-    }
-    
-    // Determine slide direction
-    const sections = ['traditional', 'hybrid', 'modern'];
-    const currentIndex = sections.indexOf(this.currentSection);
-    const targetIndex = sections.indexOf(sectionName);
-    const slideDirection = targetIndex > currentIndex ? 'right' : 'left';
-    
-    console.log(`📐 Slide direction: ${slideDirection} (${currentIndex} → ${targetIndex})`);
-    
-    // Execute slide transition
-    this.executeSlideTransition(currentSection, targetSection, slideDirection)
-      .then(() => {
-        this.currentSection = sectionName;
-        this.isTransitioning = false;
-        console.log(`✅ Slide complete: ${sectionName}`);
-      })
-      .catch((error) => {
-        console.error('❌ Slide transition failed:', error);
-        this.isTransitioning = false;
-      });
-  },
-  
-  // Execute slide transition
-  executeSlideTransition: function(currentSection, targetSection, direction) {
-    return new Promise((resolve) => {
-      console.log('🎭 Preparing slide transition...');
-      
-      // Phase 1: Prepare sections
-      this.prepareSections(currentSection, targetSection, direction);
-      
-      // Phase 2: Start transition
-      setTimeout(() => {
-        console.log('🎬 Executing slide out...');
-        this.slideOutCurrent(currentSection, direction);
-        
-        // Phase 3: Switch sections
-        setTimeout(() => {
-          console.log('🔄 Switching sections...');
-          this.switchSections(currentSection, targetSection);
-          
-          // Phase 4: Slide in new section
-          setTimeout(() => {
-            console.log('🎭 Sliding in new section...');
-            this.slideInTarget(targetSection, direction);
-            
-            // Phase 5: Cleanup
-            setTimeout(() => {
-              console.log('🧹 Cleaning up...');
-              this.cleanupTransition(currentSection, targetSection);
-              resolve();
-            }, 1200);
-            
-          }, 100);
-        }, 400);
-      }, 50);
-    });
-  },
-  
-  // Prepare sections for transition
-  prepareSections: function(currentSection, targetSection, direction) {
-    // Add container styling
-    currentSection.classList.add('concept-section-container');
-    targetSection.classList.add('concept-section-container');
-    
-    // Prepare images
-    const currentImages = currentSection.querySelectorAll('.xb-image');
-    const targetImages = targetSection.querySelectorAll('.xb-image');
-    
-    currentImages.forEach(img => img.classList.add('concept-image-slide', 'slide-active'));
-    targetImages.forEach(img => img.classList.add('concept-image-slide', 'slide-in'));
-    
-    // Prepare text elements
-    const currentTexts = currentSection.querySelectorAll('h1, h2, h3, p, .xb-text');
-    const targetTexts = targetSection.querySelectorAll('h1, h2, h3, p, .xb-text');
-    
-    currentTexts.forEach(text => text.classList.add('concept-text-slide', 'slide-active'));
-    targetTexts.forEach(text => text.classList.add('concept-text-slide'));
-    
-    // Prepare target section position
-    targetSection.classList.add('concept-slide');
-    if (direction === 'right') {
-      targetSection.classList.add('slide-in-right');
-    } else {
-      targetSection.classList.add('slide-in-left');
-    }
-    
-    console.log(`🎯 Sections prepared for ${direction} slide`);
-  },
-  
-  // Slide out current section
-  slideOutCurrent: function(currentSection, direction) {
-    currentSection.classList.add('concept-slide');
-    
-    if (direction === 'right') {
-      currentSection.classList.add('slide-out-left');
-    } else {
-      currentSection.classList.add('slide-out-right');
-    }
-    
-    // Animate elements out
-    const images = currentSection.querySelectorAll('.concept-image-slide');
-    const texts = currentSection.querySelectorAll('.concept-text-slide');
-    
-    images.forEach(img => img.classList.add('slide-out'));
-    texts.forEach(text => text.classList.remove('slide-active'));
-  },
-  
-  // Switch sections
-  switchSections: function(currentSection, targetSection) {
-    // Hide current
-    currentSection.classList.remove('concepts-visible');
-    currentSection.classList.add('concepts-hidden');
-    
-    // Show target
-    targetSection.classList.remove('concepts-hidden');
-    targetSection.classList.add('concepts-visible');
-  },
-  
-  // Slide in target section
-  slideInTarget: function(targetSection, direction) {
-    targetSection.classList.remove('slide-in-left', 'slide-in-right');
-    targetSection.classList.add('active', 'elastic-transition');
-    
-    // Animate elements in
-    const images = targetSection.querySelectorAll('.concept-image-slide');
-    const texts = targetSection.querySelectorAll('.concept-text-slide');
-    
-    images.forEach((img, index) => {
-      setTimeout(() => {
-        img.classList.remove('slide-in');
-        img.classList.add('slide-active');
-      }, index * 100);
-    });
-    
-    texts.forEach((text, index) => {
-      setTimeout(() => {
-        text.classList.add('slide-active');
-      }, index * 150 + 200);
-    });
-  },
-  
-  // Cleanup transition
-  cleanupTransition: function(currentSection, targetSection) {
-    // Remove transition classes
-    [currentSection, targetSection].forEach(section => {
-      section.classList.remove(
-        'concept-slide', 'slide-out-left', 'slide-out-right',
-        'slide-in-left', 'slide-in-right', 'active', 'elastic-transition'
-      );
-    });
-    
-    // Clean element classes
-    document.querySelectorAll('.concept-image-slide').forEach(img => {
-      img.classList.remove('concept-image-slide', 'slide-out', 'slide-in', 'slide-active');
-    });
-    
-    document.querySelectorAll('.concept-text-slide').forEach(text => {
-      text.classList.remove('concept-text-slide', 'slide-active');
-    });
-  },
-  
-  // Hide all sections
+  // Hide all concept sections
   hideAllSections: function() {
     document.querySelectorAll('.concepts-hidden, .concepts-visible').forEach(section => {
       section.classList.remove('concepts-visible', 'concepts-revealing');
@@ -623,11 +416,13 @@ window.conceptManager = {
     });
   },
   
-  // Scroll to section
+  // Scroll to section (use existing smooth scroll if available)
   scrollToSection: function(element) {
     if (typeof scrollToSection === 'function') {
+      // Use existing smooth scroll
       scrollToSection(element.id);
     } else {
+      // Fallback smooth scroll
       element.scrollIntoView({ 
         behavior: 'smooth',
         block: 'start'
@@ -636,11 +431,13 @@ window.conceptManager = {
   }
 };
 
-// REPLACE the existing initialization
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+  // Delay to ensure hero images are loaded
   setTimeout(() => {
     window.conceptManager.init();
   }, 1000);
 });
+
 
 
