@@ -418,22 +418,9 @@ window.conceptManager = {
       
       .transition-block {
         flex: 1;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #3b3b3b;
         transform: scaleY(0);
         will-change: transform;
-      }
-      
-      /* Theme variations */
-      .concept-transition.traditional .transition-block {
-        background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-      }
-      
-      .concept-transition.hybrid .transition-block {
-        background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
-      }
-      
-      .concept-transition.modern .transition-block {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       }
     `;
     document.head.appendChild(style);
