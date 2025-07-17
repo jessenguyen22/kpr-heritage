@@ -333,7 +333,58 @@ window.addEventListener("load", () => {
   createSectionAnimation("modern-section");
 });
 
+// ===========================================
+// DYNAMIC CONCEPT SECTIONS SYSTEM
+// ===========================================
 
+// Global concept manager
+window.conceptManager = {
+  currentSection: null,
+  
+  // Show specific concept section
+  showSection: function(sectionName) {
+    console.log('Showing section:', sectionName);
+    
+    // Hide all concept sections
+    this.hideAllSections();
+    
+    // Show target section
+    const targetSection = document.getElementById(`${sectionName}-section`);
+    if (targetSection) {
+      targetSection.classList.remove('concepts-hidden');
+      targetSection.classList.add('concepts-visible', 'concepts-revealing');
+      
+      // Scroll to section
+      this.scrollToSection(targetSection);
+      
+      this.currentSection = sectionName;
+    }
+  },
+  
+  // Hide all concept sections
+  hideAllSections: function() {
+    document.querySelectorAll('.concepts-hidden, .concepts-visible').forEach(section => {
+      section.classList.remove('concepts-visible', 'concepts-revealing');
+      section.classList.add('concepts-hidden');
+    });
+  },
+  
+  // Scroll to section (use existing smooth scroll if available)
+  scrollToSection: function(element) {
+    if (typeof scrollToSection === 'function') {
+      // Use existing smooth scroll
+      scrollToSection(element.id);
+    } else {
+      // Fallback smooth scroll
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }
+};
+
+console.log('✅ Concept Manager initialized');
 
 
 
