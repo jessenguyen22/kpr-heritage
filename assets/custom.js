@@ -340,6 +340,7 @@ window.addEventListener("load", () => {
 // Global concept manager
 window.conceptManager = {
   currentSection: null,
+  isFirstLoad: true, // Track if it's first load from hero
   
   // Initialize hero image clicks
   init: function() {
@@ -385,9 +386,16 @@ window.conceptManager = {
     });
   },
   
+// Global concept manager
+window.conceptManager = {
+  currentSection: null,
+  isFirstLoad: true, // Track if it's first load from hero
+  
+  // ... existing code ...
+  
   // Show specific concept section
-  showSection: function(sectionName) {
-    console.log('Showing section:', sectionName);
+  showSection: function(sectionName, fromNavigation = false) {
+    console.log('Showing section:', sectionName, 'From nav:', fromNavigation);
     
     // Hide all concept sections
     this.hideAllSections();
@@ -396,12 +404,26 @@ window.conceptManager = {
     const targetSection = document.getElementById(`${sectionName}-section`);
     if (targetSection) {
       targetSection.classList.remove('concepts-hidden');
-      targetSection.classList.add('concepts-visible', 'concepts-revealing');
+      targetSection.classList.add('concepts-visible');
       
-      // Scroll to section with delay for animation
-      setTimeout(() => {
-        this.scrollToSection(targetSection);
-      }, 100);
+      // Different animations based on source
+      if (fromNavigation && !this.isFirstLoad) {
+        // Section to section - elastic animation
+        targetSection.classList.add('concepts-switching');
+        console.log('Using elastic switch animation');
+      } else {
+        // Hero to section - original animation
+        targetSection.classList.add('concepts-revealing');
+        console.log('Using reveal animation');
+        this.isFirstLoad = false;
+      }
+      
+      // Scroll only if not from navigation
+      if (!fromNavigation) {
+        setTimeout(() => {
+          this.scrollToSection(targetSection);
+        }, 100);
+      }
       
       this.currentSection = sectionName;
     }
@@ -410,11 +432,32 @@ window.conceptManager = {
   // Hide all concept sections
   hideAllSections: function() {
     document.querySelectorAll('.concepts-hidden, .concepts-visible').forEach(section => {
-      section.classList.remove('concepts-visible', 'concepts-revealing');
+      section.classList.remove('concepts-visible', 'concepts-revealing', 'concepts-switching');
       section.classList.add('concepts-hidden');
     });
   },
+    // NEW: Setup navigation within sections
+  setupSectionNavigation: function() {
+    // Target navigation links trong sections (sidebar links)
+    document.querySelectorAll('[data-concept-nav]').forEach(navLink => {
+      navLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        const targetSection = navLink.dataset.conceptNav;
+        console.log('Section navigation clicked:', targetSection);
+        
+        // Use elastic animation for section-to-section
+        this.showSection(targetSection, true);
+      });
+    });
+  },
   
+  // Initialize hero image clicks
+  init: function() {
+    this.setupHeroClicks();
+    this.setupSectionNavigation();
+    console.log('✅ Concept Manager initialized with hero clicks and navigation');
+  },
   // Scroll to section (use existing smooth scroll if available)
   scrollToSection: function(element) {
     if (typeof scrollToSection === 'function') {
