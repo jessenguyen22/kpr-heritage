@@ -193,7 +193,7 @@ heroTl
   
 
   // 5. SMOOTH SCROLL FUNCTIONALITY (UPDATED)
-  // Thay thế function scrollToSection cũ bằng cái này
+
   function scrollToSection(targetId) {
     const targetElement = document.getElementById(targetId);
     if (!targetElement) {
@@ -234,7 +234,7 @@ heroTl
           ease: "power3.out",
         })
         // Stage 2: Pause để animation settle
-        .to({}, { duration: 0.3 })
+        .to({}, { duration: 0.2 })
         // Stage 3: Scroll to target position
         .to(window, {
           scrollTo: { y: targetScroll },
