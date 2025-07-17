@@ -592,9 +592,9 @@ window.conceptManager = {
       
       gsap.to(".transition-block", {
         scaleY: 0,
-        duration: 0.8,
+        duration: 0.4,
         stagger: {
-          each: 0.06,
+          each: 0.04,
           from: "center",
           grid: [2, 6],
           axis: "x"
