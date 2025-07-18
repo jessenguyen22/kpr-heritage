@@ -9,12 +9,17 @@
  */
 {
   "sections": {
-    "id_md8kjl9a1176v3g": {
+    "id_md8l1gsk1177oyg": {
       "type": "xb-home",
+      "settings": {}
+    },
+    "id_md8l1gsk11783j5": {
+      "type": "xb-home-part-2",
       "settings": {}
     }
   },
   "order": [
-    "id_md8kjl9a1176v3g"
+    "id_md8l1gsk1177oyg",
+    "id_md8l1gsk11783j5"
   ]
 }
