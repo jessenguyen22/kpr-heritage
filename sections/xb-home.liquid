@@ -3056,7 +3056,7 @@
 >
   {% assign designMode = false %}
 {% liquid
-  assign show_secondary_image = "yes"
+  assign show_secondary_image = "no"
   assign cond = "empty"
 
   if cond == 'empty'
@@ -3076,7 +3076,7 @@
   %}
   <a
     href="{{ product_item.url }}"
-    class="xb-product-image xb-image xb-product-image__static xb-link id_md8n2c4n681dza" style="--xb-product-media-aspect-ratio-desktop:100 / 135;--xb-product-media-aspect-ratio-tablet:100 / 135;--xb-product-media-aspect-ratio-mobile:100 / 135;--xb-product-media-object-fit:cover;--xb-product-media-width-desktop:100%;--xb-product-media-width-tablet:100%;--xb-product-media-width-mobile:100%;--xb-product-image-mask-svg:url('https://cdn.shopify.com/s/files/1/0677/7900/2622/files/Mask_Abstract_1.svg?v=1712119221');width:100%;"   
+    class="xb-product-image xb-image xb-product-image__static xb-link kpr-masked-img-product id_md8n2c4n681dza" style="--xb-product-media-aspect-ratio-desktop:100 / 125;--xb-product-media-aspect-ratio-tablet:100 / 135;--xb-product-media-aspect-ratio-mobile:100 / 135;--xb-product-media-object-fit:cover;--xb-product-media-width-desktop:100%;--xb-product-media-width-tablet:100%;--xb-product-media-width-mobile:100%;--xb-product-image-mask-svg:url('https://cdn.shopify.com/s/files/1/0677/7900/2622/files/Mask_Abstract_1.svg?v=1712119221');width:100%;"   
   >
     <div
       class="xb-product-image__first"
@@ -3356,33 +3356,6 @@
   
 >
   {% assign designMode = false %}
-{% liquid
-  assign cond = "empty"
-  if cond == 'empty'
-    assign cond = false
-  endif
-  assign product_item = product
-
-  if cond
-    assign product_item = all_products["undefined"]
-  endif
-%}
-
-
-
-{% if product_item and product_item != blank %}
-  {% if product_item.vendor != blank %}
-    <a
-      class="xb-product-vendor xb-link id_md8n2c4n689jsq"   
-      href="{{ shop.url }}/collections/vendors?q={{ product_item.vendor | escape }}"
-    >
-      {{ product_item.vendor }}
-    </a>
-  {% endif %}
-{% elsif designMode %}
-  
-{% endif %}
-{% assign designMode = false %}
 {% liquid
   assign cond = "empty"
   if cond == 'empty'
