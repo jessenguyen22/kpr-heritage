@@ -1,0 +1,136 @@
+<!-- sections/kpr-hero-basic.liquid -->
+
+
+{{ 'kpr-hero.css' | asset_url | stylesheet_tag }}
+
+<section class="kpr-hero {{ section.settings.custom_class }}" 
+         {% if section.settings.custom_id != blank %}id="{{ section.settings.custom_id }}"{% endif %}
+         data-section-id="{{ section.id }}"
+         data-section-type="kpr-hero"
+         {% unless section.settings.show_on_desktop %}data-hide-desktop{% endunless %}
+         {% unless section.settings.show_on_mobile %}data-hide-mobile{% endunless %}>
+  
+  <!-- Background Video -->
+  {% if section.settings.background_video != blank %}
+    <div class="kpr-hero__video-bg">
+      {{ section.settings.background_video | video_tag: 
+          autoplay: section.settings.autoplay,
+          muted: true,
+          loop: false,
+          playsinline: true,
+          loading: 'eager',
+          class: 'kpr-hero__video'
+      }}
+    </div>
+  {% endif %}
+
+  <!-- Concept Lottie Positions -->
+  <div class="kpr-hero__concepts">
+    
+    <!-- Left Concept - Traditional -->
+    {% if section.settings.traditional_lottie_url != blank %}
+        <div class="kpr-concept kpr-concept--left" 
+             data-concept="traditional"
+             data-lottie-url="{{ section.settings.traditional_lottie_url }}">
+          <div class="kpr-concept__lottie" id="kpr-traditional-lottie-{{ section.id }}"></div>
+        </div>
+      {% endif %}
+
+    <!-- Center Concept - Hybrid -->  
+    {% if section.settings.hybrid_lottie_url != blank %}
+        <div class="kpr-concept kpr-concept--center" 
+             data-concept="hybrid"
+             data-lottie-url="{{ section.settings.hybrid_lottie_url }}">
+          <div class="kpr-concept__lottie" id="kpr-hybrid-lottie-{{ section.id }}"></div>
+        </div>
+      {% endif %}
+
+    <!-- Right Concept - Modern -->
+    {% if section.settings.modern_lottie_url != blank %}
+        <div class="kpr-concept kpr-concept--right" 
+             data-concept="modern"
+             data-lottie-url="{{ section.settings.modern_lottie_url }}">
+          <div class="kpr-concept__lottie" id="kpr-modern-lottie-{{ section.id }}"></div>
+        </div>
+      {% endif %}
+
+  </div>
+
+</section>
+
+{{ 'kpr-hero.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "KPR Hero Basic",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "text",
+      "id": "custom_class",
+      "label": "Custom CSS Class",
+      "info": "Add custom CSS classes (space separated)"
+    },
+    {
+      "type": "text", 
+      "id": "custom_id",
+      "label": "Custom ID",
+      "info": "Add custom HTML ID"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_desktop",
+      "label": "Show on Desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_mobile", 
+      "label": "Show on Mobile",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Video Settings"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background Video"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Auto Play Video",
+      "default": true
+    },
+    {
+        "type": "header",
+        "content": "Lottie Animations"
+      },
+      {
+        "type": "url",
+        "id": "traditional_lottie_url",
+        "label": "Traditional Lottie URL"
+      },
+      {
+        "type": "url", 
+        "id": "hybrid_lottie_url",
+        "label": "Hybrid Lottie URL"
+      },
+      {
+        "type": "url",
+        "id": "modern_lottie_url", 
+        "label": "Modern Lottie URL"
+      }
+  ],
+  "presets": [
+    {
+      "name": "KPR Hero Basic"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,429 @@
+/* Placeholder Sections */
+.kpr-content__sections {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  
+  .kpr-section {
+    min-height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #fff;
+  }/* assets/kpr-traditional.css */
+  
+  .kpr-traditional {
+    min-height: 100vh;
+    background: #1a1a1a;
+    color: white;
+    position: relative;
+  }
+  
+  .kpr-traditional__container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(1, 1fr);
+    gap: 8px;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Left Navigation - 2 columns */
+  .kpr-traditional__navigation {
+    grid-column: span 2 / span 2;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .kpr-nav__content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .kpr-nav__content h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  
+  .kpr-nav__content p {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  /* Right Content - 10 columns */
+  .kpr-traditional__content {
+    grid-column: span 10 / span 10;
+    grid-column-start: 3;
+    background: #000;
+    position: relative;
+  }
+  
+  .kpr-content__inner {
+    padding: 40px;
+    min-height: 100vh;
+    padding-top: 10px;
+  }
+  
+  .kpr-content__inner h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+  
+  .kpr-content__inner p {
+    font-size: 1.1rem;
+    color: #ccc;
+    margin-bottom: 2rem;
+  }
+  
+  /* Section 1: Grid Layout */
+  .kpr-section--1 {
+    min-height: 100vh;
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: block;
+  }
+  
+  .kpr-section1__grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 8px;
+    height: 100vh;
+    width: 100%;
+  }
+  
+  /* Banner Area - 2 rows */
+  .kpr-section1__banner {
+    grid-column: span 10 / span 10;
+    grid-row: span 1 / span 1;
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+  }
+  
+  .kpr-banner__image {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .kpr-banner__bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .kpr-banner__placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a, #333);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .kpr-banner__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* background: rgba(0, 0, 0, 0.4); */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px;
+  }
+  
+  .kpr-banner__content {
+    max-width: 50%;
+    color: white;
+  }
+  
+  .kpr-banner__title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  .kpr-banner__description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+  
+  .kpr-banner__btn {
+    display: none;
+    padding: 12px 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .kpr-banner__btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+  }
+  
+  /* Slider Area - 3 rows */
+  .kpr-section1__slider {
+    grid-column: span 10 / span 10;
+    grid-row: span 3 / span 3;
+    grid-row-start: 2;
+    position: relative;
+
+  }
+  
+  .kpr-slider__container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .kpr-products-slider {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .kpr-products-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+
+  }
+  
+  .kpr-product-item {
+
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    
+  }
+  
+
+  
+  .kpr-product__image {
+    width: 100%;
+    aspect-ratio: 10 / 1;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+  
+  }
+  
+  .kpr-product__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .kpr-product__placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #333, #555);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+  }
+  
+  .kpr-product__info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: fit-content;
+    border-top: 1px solid rgba(255, 255, 255);
+    padding-top: 15px;
+  }
+  
+  .kpr-product__details {
+    flex: 1;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .kpr-product__title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1;
+  }
+  
+  .kpr-product__rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .kpr-stars {
+    color: #ffd700;
+    font-size: 0.9rem;
+  }
+  
+  .kpr-rating-count {
+    color: #ccc;
+    font-size: 0.8rem;
+  }
+  
+  .kpr-product__price {
+    margin: 0;
+    line-height: 1;
+  }
+  
+  .kpr-price--regular {
+    color: #ff4444;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .kpr-price--sale {
+    color: #ff4444;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  
+  .kpr-price--compare {
+    color: #999;
+    font-size: 1.1rem;
+    text-decoration: line-through;
+  }
+  
+  .kpr-product__actions {
+    flex: 1;
+    width: 50%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .kpr-product__btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    min-width: 140px;
+  }
+  
+  .kpr-product__btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  /* Swiper Navigation */
+  .kpr-slider-next,
+  .kpr-slider-prev {
+    color: white !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    margin-top: -22px !important;
+  }
+  
+  .kpr-slider-next:after,
+  .kpr-slider-prev:after {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+  }
+  
+  .kpr-slider-pagination {
+    bottom: 10px !important;
+  }
+  
+  .kpr-slider-pagination .swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.5) !important;
+  }
+  
+  .kpr-slider-pagination .swiper-pagination-bullet-active {
+    background: white !important;
+  }
+  
+  .kpr-section--2 {
+    min-height: 200vh; /* Section 2: Vertical Showcase */
+    background: rgba(0, 255, 0, 0.1);
+  }
+  
+  .kpr-section--3 {
+    min-height: 100vh; /* Section 3: Demo */
+    background: rgba(0, 0, 255, 0.1);
+  }
+  
+  /* Visibility Controls */
+  @media (min-width: 769px) {
+    .kpr-traditional[data-hide-desktop] {
+      display: none !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .kpr-traditional[data-hide-mobile] {
+      display: none !important;
+    }
+    
+    .kpr-traditional__container {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    
+    .kpr-traditional__navigation {
+      grid-column: span 1;
+      position: relative;
+      height: auto;
+      min-height: 200px;
+    }
+    
+    .kpr-traditional__content {
+      grid-column: span 1;
+      grid-column-start: 1;
+    }
+    
+    .kpr-content__inner {
+      padding: 20px;
+    }
+    
+    .kpr-content__inner h2 {
+      font-size: 2rem;
+    }
+  }

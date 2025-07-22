@@ -1,0 +1,104 @@
+/* assets/kpr-hero.css */
+
+.kpr-hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .kpr-hero__video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  
+  .kpr-hero__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .kpr-hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+  }
+  
+
+  /* Concept Positioning Layout */
+.kpr-hero__concepts {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allow clicks to pass through to video */
+  }
+  
+  .kpr-concept {
+    position: absolute;
+    pointer-events: auto; /* Re-enable clicks on concept areas */
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+ 
+  
+  /* Left Concept - Traditional */
+  .kpr-concept--left {
+    top: 20%;
+    left: 2%;
+    width: 480px;
+    height: 480px;
+  }
+  
+  /* Right Concept - Modern */
+  .kpr-concept--right {
+    top: 20%;
+    right: -2%;
+    width: 550px;
+    height: 500px;
+  }
+  
+  /* Center Concept - Hybrid (above center content) */
+  .kpr-concept--center {
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 500px;
+  }
+  
+  .kpr-concept__lottie {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Visibility Controls */
+  @media (min-width: 769px) {
+    .kpr-hero[data-hide-desktop] {
+      display: none !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .kpr-hero[data-hide-mobile] {
+      display: none !important;
+    }
+    
+    .kpr-hero__content h1 {
+      font-size: 2rem;
+    }
+    
+    .kpr-hero__content p {
+      font-size: 1rem;
+    }
+  }

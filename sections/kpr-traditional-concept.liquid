@@ -1,0 +1,302 @@
+<!-- sections/kpr-traditional-concept.liquid -->
+
+{{ 'kpr-traditional.css' | asset_url | stylesheet_tag }}
+<!-- Add Swiper CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.4.7/swiper-bundle.min.css">
+
+<section
+  class="kpr-traditional {{ section.settings.custom_class }}"
+  {% if section.settings.custom_id != blank %}
+    id="{{ section.settings.custom_id }}"
+  {% endif %}
+  data-section-id="{{ section.id }}"
+  data-section-type="kpr-traditional"
+  data-concept-section="traditional"
+  {% unless section.settings.show_on_desktop %}
+    data-hide-desktop
+  {% endunless %}
+  {% unless section.settings.show_on_mobile %}
+    data-hide-mobile
+  {% endunless %}
+>
+  <div class="kpr-traditional__container">
+    <!-- Left Navigation - 2 columns -->
+    <div class="kpr-traditional__navigation">
+      <div class="kpr-nav__content">
+        <h3>Navigation</h3>
+        <p>Sidebar content will go here</p>
+      </div>
+    </div>
+
+    <!-- Right Content - 10 columns -->
+    <div class="kpr-traditional__content">
+      <div class="kpr-content__inner">
+        <!-- Section 1: Horizontal Slider -->
+        <div class="kpr-section kpr-section--1">
+          <div class="kpr-section1__grid">
+            <!-- Top: Banner with Text Overlay (2 rows) -->
+            <div class="kpr-section1__banner">
+              <div class="kpr-banner__image">
+                {% if section.settings.section1_banner_image %}
+                  <img
+                    src="{{ section.settings.section1_banner_image | img_url: '1200x400' }}"
+                    alt="{{ section.settings.section1_banner_image.alt | escape }}"
+                    class="kpr-banner__bg"
+                  >
+                {% else %}
+                  <div class="kpr-banner__placeholder"></div>
+                {% endif %}
+
+                <div class="kpr-banner__overlay">
+                  <div class="kpr-banner__content">
+                    <h2 class="kpr-banner__title">{{ section.settings.section1_banner_title }}</h2>
+                    <p class="kpr-banner__description">{{ section.settings.section1_banner_description }}</p>
+                    <a href="{{ section.settings.section1_view_all_url }}" class="kpr-banner__btn">
+                      {{ section.settings.section1_view_all_text }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom: Product Slider (3 rows) -->
+            <div class="kpr-section1__slider">
+              <div class="kpr-slider__container">
+                <!-- Swiper Container -->
+                <div class="swiper kpr-products-slider">
+                  <div class="swiper-wrapper">
+                    {% assign collection = collections[section.settings.section1_collection] %}
+                    {% if collection.products.size > 0 %}
+                      {% assign products_per_slide = 3 %}
+                      {% assign total_slides = collection.products.size | divided_by: products_per_slide | ceil %}
+                      {% assign max_slide_index = total_slides | minus: 1 %}
+                      {% for i in (0..max_slide_index) %}
+                        {% assign start_index = i | times: products_per_slide %}
+                        {% assign end_index = start_index | plus: products_per_slide | minus: 1 %}
+
+                        <div class="swiper-slide">
+                          <div class="kpr-products-grid">
+                            {% for j in (start_index..end_index) %}
+                              {% if collection.products[j] %}
+                                {% assign product = collection.products[j] %}
+                                <div class="kpr-product-item">
+                                  <!-- Product Image/Video -->
+                                  <div class="kpr-product__image">
+                                    {% if product.metafields.kpr.product_image_horizontal != blank
+                                      and product.metafields.kpr.product_image_horizontal.type == 'file_reference'
+                                    %}
+                                      {% assign horizontal_media = product.metafields.kpr.product_image_horizontal %}
+                                      {% assign file_url = horizontal_media | file_url %}
+
+                                      {% comment %} Check if it's a video file by URL extension {% endcomment %}
+                                      {% if file_url contains '.mp4'
+                                        or file_url contains '.webm'
+                                        or file_url contains '.mov'
+                                      %}
+                                        <!-- Video File -->
+                                        <video
+                                          class="kpr-product__video"
+                                          playsinline
+                                          autoplay
+                                          muted
+                                          loop
+                                          preload="none"
+                                        >
+                                          <source src="{{ file_url }}" type="video/mp4">
+                                          Your browser does not support the video tag.
+                                        </video>
+                                      {% else %}
+                                        <!-- Image File -->
+                                        <img
+                                          src="{{ horizontal_media | img_url: '800x80' }}"
+                                          alt="{{ product.title | escape }}"
+                                          loading="lazy"
+                                        >
+                                      {% endif %}
+
+                                    {% elsif product.featured_image %}
+                                      <!-- Fallback to featured image -->
+                                      <img
+                                        src="{{ product.featured_image | img_url: '800x80' }}"
+                                        alt="{{ product.featured_image.alt | escape }}"
+                                        loading="lazy"
+                                      >
+                                    {% else %}
+                                      <!-- Placeholder -->
+                                      <div class="kpr-product__placeholder">
+                                        {{ product.title | default: 'No Media' }}
+                                      </div>
+                                    {% endif %}
+                                  </div>
+
+                                  <!-- Product Info -->
+                                  <div class="kpr-product__info">
+                                    <div class="kpr-product__details">
+                                      <h3 class="kpr-product__title">{{ product.title }}</h3>
+
+                                      <!-- Rating -->
+                                      {% comment %}
+                                        <div class="kpr-product__rating">
+                                          <div class="kpr-stars">★★★★★</div>
+                                          <span class="kpr-rating-count">(128 reviews)</span>
+                                        </div>
+                                      {% endcomment %}
+
+                                      <!-- Price -->
+                                      <div class="kpr-product__price">
+                                        {% if product.compare_at_price > product.price %}
+                                          <span class="kpr-price--sale">{{ product.price | money }}</span>
+                                          <span class="kpr-price--compare">{{ product.compare_at_price | money }}</span>
+                                        {% else %}
+                                          <span class="kpr-price--regular">{{ product.price | money }}</span>
+                                        {% endif %}
+                                      </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="kpr-product__actions">
+                                      
+                                    </div>
+                                  </div>
+                                </div>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endfor %}
+
+                    {% else %}
+                      <!-- Demo slides if no products -->
+                      {% for slide in (1..2) %}
+                        <div class="swiper-slide">
+                          <div class="kpr-products-grid">
+                            {% for i in (1..3) %}
+                              <div class="kpr-product-item kpr-product-item--demo">
+                                <div class="kpr-product__image">
+                                  <div class="kpr-product__placeholder">Demo Cue {{ forloop.index }}</div>
+                                </div>
+                                <div class="kpr-product__info">
+                                  <div class="kpr-product__details">
+                                    <h3 class="kpr-product__title">KYPER POOL CUE {{ i }}</h3>
+                                    <div class="kpr-product__rating">
+                                      <div class="kpr-stars">★★★★★</div>
+                                      <span class="kpr-rating-count">(128 reviews)</span>
+                                    </div>
+                                    <div class="kpr-product__price">
+                                      <span class="kpr-price--regular">${{ 200 | times: i }}</span>
+                                    </div>
+                                  </div>
+                                  <div class="kpr-product__actions">
+                                    <button class="kpr-product__btn">ADD TO CART</button>
+                                  </div>
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  <!-- Navigation -->
+                  <div class="swiper-button-next kpr-slider-next"></div>
+                  <div class="swiper-button-prev kpr-slider-prev"></div>
+
+                  <!-- Pagination -->
+                  <div class="swiper-pagination kpr-slider-pagination"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholder cho sections khác -->
+        <div class="kpr-content__sections">
+          <div class="kpr-section kpr-section--2">Section 2: Vertical Showcase</div>
+          <div class="kpr-section kpr-section--3">Section 3: Demo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add Swiper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.4.7/swiper-bundle.min.js"></script>
+{{ 'kpr-traditional.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "KPR Traditional Concept",
+  "class": "kpr-traditional-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "text",
+      "id": "custom_class",
+      "label": "Custom CSS Class"
+    },
+    {
+      "type": "text",
+      "id": "custom_id",
+      "label": "Custom ID"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_desktop",
+      "label": "Show on Desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_mobile",
+      "label": "Show on Mobile",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section 1: Product Slider"
+    },
+    {
+      "type": "image_picker",
+      "id": "section1_banner_image",
+      "label": "Section 1 Banner Image"
+    },
+    {
+      "type": "text",
+      "id": "section1_banner_title",
+      "label": "Banner Title",
+      "default": "TRADITIONAL NEW ARRIVALS"
+    },
+    {
+      "type": "textarea",
+      "id": "section1_banner_description",
+      "label": "Banner Description",
+      "default": "Our thoughtfully curated pool cues are designed to enhance your natural precision and make every shot feel special."
+    },
+    {
+      "type": "text",
+      "id": "section1_view_all_text",
+      "label": "View All Button Text",
+      "default": "VIEW ALL"
+    },
+    {
+      "type": "url",
+      "id": "section1_view_all_url",
+      "label": "View All URL"
+    },
+    {
+      "type": "collection",
+      "id": "section1_collection",
+      "label": "Products Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "KPR Traditional Concept"
+    }
+  ]
+}
+{% endschema %}
