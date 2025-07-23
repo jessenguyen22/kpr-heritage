@@ -12,6 +12,8 @@
   data-section-id="{{ section.id }}"
   data-section-type="kpr-traditional"
   data-concept-section="traditional"
+  data-enable-autoplay="{{ section.settings.enable_autoplay }}"
+  data-autoplay-delay="{{ section.settings.autoplay_delay }}"
   {% unless section.settings.show_on_desktop %}
     data-hide-desktop
   {% endunless %}
@@ -42,6 +44,8 @@
                     src="{{ section.settings.section1_banner_image | img_url: '1200x400' }}"
                     alt="{{ section.settings.section1_banner_image.alt | escape }}"
                     class="kpr-banner__bg"
+                    width="1200"
+                    height="400"
                   >
                 {% else %}
                   <div class="kpr-banner__placeholder"></div>
@@ -111,6 +115,8 @@
                                           src="{{ horizontal_media | img_url: '800x80' }}"
                                           alt="{{ product.title | escape }}"
                                           loading="lazy"
+                                          width="800"
+                                          height="80"
                                         >
                                       {% endif %}
 
@@ -120,6 +126,8 @@
                                         src="{{ product.featured_image | img_url: '800x80' }}"
                                         alt="{{ product.featured_image.alt | escape }}"
                                         loading="lazy"
+                                        width="800"
+                                        height="80"
                                       >
                                     {% else %}
                                       <!-- Placeholder -->
@@ -155,7 +163,77 @@
 
                                     <!-- Actions -->
                                     <div class="kpr-product__actions">
-                                      
+                                      {% liquid
+                                        assign variant = product.selected_or_first_available_variant
+                                        assign inventory_quantity = variant.inventory_quantity
+                                        assign inventory_policy = variant.inventory_policy
+
+                                        if variant.inventory_management == 'shopify'
+                                          assign inventory_managed = true
+                                        endif
+
+                                        if variant.quantity_rule.min > variant.inventory_quantity and inventory_managed and inventory_policy == 'deny'
+                                          assign quantity_rule_soldout = true
+                                        endif
+
+                                        if inventory_managed
+                                          if inventory_quantity <= 0 and inventory_policy == 'deny' or quantity_rule_soldout
+                                            assign can_add_to_cart = false
+                                            assign add_to_cart_text = 'products.product.sold_out' | t
+                                          else
+                                            assign can_add_to_cart = true
+                                            assign add_to_cart_text = 'products.product.add_to_cart' | t
+                                          endif
+                                        else
+                                          if product.selected_or_first_available_variant != null
+                                            assign can_add_to_cart = true
+                                            assign add_to_cart_text = 'products.product.add_to_cart' | t
+                                          else
+                                            assign can_add_to_cart = false
+                                            assign add_to_cart_text = 'products.product.unavailable' | t
+                                          endif
+                                        endif
+                                      %}
+
+                                      {%- assign product_form_id = 'KPRProductForm-' | append: product.id | append: '-' | append: section.id -%}
+                                      <product-form-component
+                                        data-section-id="{{ section.id }}"
+                                        data-product-id="{{ product.id }}"
+                                        data-product-url="{{ product.url }}"
+                                        on:submit="/handleSubmit"
+                                        data-quantity-default="{% if product.selected_or_first_available_variant.quantity_rule.min %}{{ product.selected_or_first_available_variant.quantity_rule.min }}{% else %}1{% endif %}"
+                                      >
+                                        <div
+                                          class="visually-hidden"
+                                          aria-live="assertive"
+                                          role="status"
+                                          aria-atomic="true"
+                                          ref="liveRegion"
+                                        ></div>
+                                        {%- form 'product', product, id: product_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                                          <input
+                                            type="hidden"
+                                            name="id"
+                                            ref="variantId"
+                                            value="{{ product.selected_or_first_available_variant.id }}"
+                                            {% if product.selected_or_first_available_variant.available == false %}
+                                              disabled
+                                            {% endif %}
+                                          >
+                                          <input
+                                            type="hidden"
+                                            name="quantity"
+                                            value="{% if product.selected_or_first_available_variant.quantity_rule.min %}{{ product.selected_or_first_available_variant.quantity_rule.min }}{% else %}1{% endif %}"
+                                          >
+                                          
+                                          {% render 'add-to-cart-button',
+                                            add_to_cart_text: add_to_cart_text,
+                                            class: 'button kpr-product__btn',
+                                            can_add_to_cart: can_add_to_cart,
+                                            product: product
+                                          %}
+                                        {%- endform -%}
+                                      </product-form-component>
                                     </div>
                                   </div>
                                 </div>
@@ -187,7 +265,12 @@
                                     </div>
                                   </div>
                                   <div class="kpr-product__actions">
-                                    <button class="kpr-product__btn">ADD TO CART</button>
+                                    {% liquid
+                                      assign add_to_cart_text = 'products.product.add_to_cart' | t
+                                    %}
+                                    <button class="kpr-product__btn" disabled>
+                                      {{ add_to_cart_text }}
+                                    </button>
                                   </div>
                                 </div>
                               </div>
@@ -212,7 +295,385 @@
 
         <!-- Placeholder cho sections khác -->
         <div class="kpr-content__sections">
-          <div class="kpr-section kpr-section--2">Section 2: Vertical Showcase</div>
+          <!-- Section 2: Vertical Showcase -->
+          <div class="kpr-section kpr-section--2">
+            <div class="kpr-section2__grid">
+              
+              <!-- Reviews Column (2fr) -->
+              <div class="kpr-section2__reviews">
+                <div class="kpr-reviews__container">
+                  <scroll-seamless
+                    class="kpr-reviews-scroll"
+                    data-vertical
+                    data-direction="up"
+                    data-speed="{{ section.settings.reviews_speed | default: 40 }}"
+                    role="marquee"
+                    aria-label="scrolling reviews"
+                  >
+                    <div class="scroll-container">
+                      <ul class="kpr-reviews-list scroll-list list-unstyled">
+                        {% comment %} Reviews from metafields or schema {% endcomment %}
+                        {% liquid
+                          assign reviews_data = product.metafields.kpr.reviews_json
+                          assign reviews = section.settings.reviews_json
+                          if reviews == blank
+                            assign reviews = '[]'
+                          endif
+                        %}
+                        
+                        {% if reviews != blank %}
+                          {% for review in reviews limit: 10 %}
+                            <li class="kpr-review-item scroll-item">
+                              <div class="kpr-review-rating">
+                                {% assign rating = review.rating | default: 5 %}
+                                <div class="kpr-stars">
+                                  {% for i in (1..5) %}
+                                    <span class="kpr-star{% if i <= rating %} kpr-star--filled{% endif %}">★</span>
+                                  {% endfor %}
+                                </div>
+                              </div>
+                              <div class="kpr-review-content">
+                                <p>{{ review.text | default: "Great product! Highly recommended." }}</p>
+                              </div>
+                              <div class="kpr-review-author">
+                                <span class="kpr-author-name">{{ review.author | default: "Customer" }}</span>
+                                {% if review.verified %}
+                                  <span class="kpr-verified-badge">✓</span>
+                                {% endif %}
+                              </div>
+                            </li>
+                          {% endfor %}
+                        {% else %}
+                          {% comment %} Demo reviews {% endcomment %}
+                          {% for i in (1..5) %}
+                            <li class="kpr-review-item scroll-item">
+                              <div class="kpr-review-rating">
+                                <div class="kpr-stars">
+                                  <span class="kpr-star kpr-star--filled">★</span>
+                                  <span class="kpr-star kpr-star--filled">★</span>
+                                  <span class="kpr-star kpr-star--filled">★</span>
+                                  <span class="kpr-star kpr-star--filled">★</span>
+                                  <span class="kpr-star kpr-star--filled">★</span>
+                                </div>
+                              </div>
+                              <div class="kpr-review-content">
+                                <p>{% case i %}{% when 1 %}Solid build and great features. Definitely a worthwhile upgrade.{% when 2 %}Impressive customization options; really adds to my gaming setup.{% when 3 %}Excellent quality and smooth performance. Love it!{% when 4 %}Perfect for my needs. Highly recommend this product.{% when 5 %}Outstanding value for money. Exceeded my expectations.{% endcase %}</p>
+                              </div>
+                              <div class="kpr-review-author">
+                                <span class="kpr-author-name">{% case i %}{% when 1 %}Jordan L.{% when 2 %}Taylor R.{% when 3 %}Alex M.{% when 4 %}Sam K.{% when 5 %}Casey J.{% endcase %}</span>
+                                <span class="kpr-verified-badge">✓</span>
+                              </div>
+                            </li>
+                          {% endfor %}
+                        {% endif %}
+                      </ul>
+                    </div>
+                  </scroll-seamless>
+                </div>
+              </div>
+              
+              <!-- Product Slider Container (6fr) -->
+              <div class="kpr-section2__slider-container">
+                <!-- Swiper Container -->
+                <div class="swiper kpr-section2-slider">
+                  <div class="swiper-wrapper">
+                    {% assign collection = collections[section.settings.section2_collection] %}
+                    {% if collection.products.size > 0 %}
+                      {% for product in collection.products limit: 6 %}
+                        <div class="swiper-slide">
+                          <div class="kpr-section2__slide-content">
+                            
+                            <!-- Thumbnails Column -->
+                            <div class="kpr-section2__thumbnails">
+                              <div class="kpr-thumbnails__container">
+                                {% if product.metafields.kpr.product_thumbnail_vertical != blank
+                                  and product.metafields.kpr.product_thumbnail_vertical.type == 'file_reference'
+                                %}
+                                  {% assign thumbnail_media = product.metafields.kpr.product_thumbnail_vertical %}
+                                  {% assign file_url = thumbnail_media | file_url %}
+                                  
+                                  {% if file_url contains '.mp4'
+                                    or file_url contains '.webm'
+                                    or file_url contains '.mov'
+                                  %}
+                                    <!-- Video Thumbnail -->
+                                    <video
+                                      class="kpr-thumbnail__video"
+                                      playsinline
+                                      muted
+                                      preload="none"
+                                      width="200"
+                                      height="250"
+                                    >
+                                      <source src="{{ file_url }}" type="video/mp4">
+                                    </video>
+                                  {% else %}
+                                    <!-- Image Thumbnail -->
+                                    <img
+                                      src="{{ thumbnail_media | img_url: '200x250' }}"
+                                      alt="{{ product.title | escape }}"
+                                      loading="lazy"
+                                      width="200"
+                                      height="250"
+                                      class="kpr-thumbnail__image"
+                                    >
+                                  {% endif %}
+                                {% else %}
+                                  <!-- Fallback Thumbnail -->
+                                  <div class="kpr-thumbnail__placeholder">
+                                    <span>{{ product.title | default: 'Product Image' }}</span>
+                                  </div>
+                                {% endif %}
+                              </div>
+                            </div>
+                            
+                            <!-- Product Column -->
+                            <div class="kpr-section2__product">
+                              <div class="kpr-product2__container">
+                                <!-- Product Image -->
+                                <div class="kpr-product2__image">
+                                  {% if product.metafields.kpr.product_image_vertical != blank
+                                    and product.metafields.kpr.product_image_vertical.type == 'file_reference'
+                                  %}
+                                    {% assign vertical_media = product.metafields.kpr.product_image_vertical %}
+                                    {% assign file_url = vertical_media | file_url %}
+                                    
+                                    {% if file_url contains '.mp4'
+                                      or file_url contains '.webm'
+                                      or file_url contains '.mov'
+                                    %}
+                                      <!-- Video Product -->
+                                      <video
+                                        class="kpr-product2__video"
+                                        playsinline
+                                        autoplay
+                                        muted
+                                        loop
+                                        preload="none"
+                                        width="150"
+                                        height="1500"
+                                      >
+                                        <source src="{{ file_url }}" type="video/mp4">
+                                      </video>
+                                    {% else %}
+                                      <!-- Image Product -->
+                                      <img
+                                        src="{{ vertical_media | img_url: '300x3000' }}"
+                                        alt="{{ product.title | escape }}"
+                                        loading="lazy"
+                                        width="200"
+                                        height="2000"
+                                        class="kpr-product2__image"
+                                        style="max-width:220px; width:100%; height:fit-content; object-fit:contain;"
+                                      >
+                                    {% endif %}
+                                  {% else %}
+                                    <!-- Fallback Product Image -->
+                                    <div class="kpr-product2__placeholder">
+                                      <span>{{ product.title | default: 'Product Image' }}</span>
+                                    </div>
+                                  {% endif %}
+                                </div>
+                                
+                                <!-- Product Info -->
+                                <div class="kpr-product2__info">
+                                  <h3 class="kpr-product2__title">{{ product.title }}</h3>
+                                  
+                                  <!-- Price -->
+                                  <div class="kpr-product2__price">
+                                    {% if product.compare_at_price > product.price %}
+                                      <span class="kpr-price--sale">{{ product.price | money }}</span>
+                                      <span class="kpr-price--compare">{{ product.compare_at_price | money }}</span>
+                                    {% else %}
+                                      <span class="kpr-price--regular">{{ product.price | money }}</span>
+                                    {% endif %}
+                                  </div>
+                                  
+                                  <!-- Add to Cart Button -->
+                                  <div class="kpr-product2__actions">
+                                    {% liquid
+                                      assign variant = product.selected_or_first_available_variant
+                                      assign inventory_quantity = variant.inventory_quantity
+                                      assign inventory_policy = variant.inventory_policy
+
+                                      if variant.inventory_management == 'shopify'
+                                        assign inventory_managed = true
+                                      endif
+
+                                      if variant.quantity_rule.min > variant.inventory_quantity and inventory_managed and inventory_policy == 'deny'
+                                        assign quantity_rule_soldout = true
+                                      endif
+
+                                      if inventory_managed
+                                        if inventory_quantity <= 0 and inventory_policy == 'deny' or quantity_rule_soldout
+                                          assign can_add_to_cart = false
+                                          assign add_to_cart_text = 'products.product.sold_out' | t
+                                        else
+                                          assign can_add_to_cart = true
+                                          assign add_to_cart_text = 'products.product.add_to_cart' | t
+                                        endif
+                                      else
+                                        if product.selected_or_first_available_variant != null
+                                          assign can_add_to_cart = true
+                                          assign add_to_cart_text = 'products.product.add_to_cart' | t
+                                        else
+                                          assign can_add_to_cart = false
+                                          assign add_to_cart_text = 'products.product.unavailable' | t
+                                        endif
+                                      endif
+                                    %}
+
+                                    {%- assign product_form_id = 'KPRProductForm2-' | append: product.id | append: '-' | append: section.id -%}
+                                    <product-form-component
+                                      data-section-id="{{ section.id }}"
+                                      data-product-id="{{ product.id }}"
+                                      data-product-url="{{ product.url }}"
+                                      on:submit="/handleSubmit"
+                                      data-quantity-default="{% if product.selected_or_first_available_variant.quantity_rule.min %}{{ product.selected_or_first_available_variant.quantity_rule.min }}{% else %}1{% endif %}"
+                                    >
+                                      <div
+                                        class="visually-hidden"
+                                        aria-live="assertive"
+                                        role="status"
+                                        aria-atomic="true"
+                                        ref="liveRegion"
+                                      ></div>
+                                      {%- form 'product', product, id: product_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                                        <input
+                                          type="hidden"
+                                          name="id"
+                                          ref="variantId"
+                                          value="{{ product.selected_or_first_available_variant.id }}"
+                                          {% if product.selected_or_first_available_variant.available == false %}
+                                            disabled
+                                          {% endif %}
+                                        >
+                                        <input
+                                          type="hidden"
+                                          name="quantity"
+                                          value="{% if product.selected_or_first_available_variant.quantity_rule.min %}{{ product.selected_or_first_available_variant.quantity_rule.min }}{% else %}1{% endif %}"
+                                        >
+                                        
+                                        {% render 'add-to-cart-button',
+                                          add_to_cart_text: add_to_cart_text,
+                                          class: 'button kpr-product2__btn',
+                                          can_add_to_cart: can_add_to_cart,
+                                          product: product
+                                        %}
+                                      {%- endform -%}
+                                    </product-form-component>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <!-- Features Column -->
+                            <div class="kpr-section2__features">
+                              <div class="kpr-features__container">
+                                <h4 class="kpr-features__title">Product Features</h4>
+                                <ul class="kpr-features__list">
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Premium materials for durability</span>
+                                  </li>
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Precision engineering for accuracy</span>
+                                  </li>
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Ergonomic design for comfort</span>
+                                  </li>
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Professional grade performance</span>
+                                  </li>
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Lifetime warranty included</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                            
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% else %}
+                      <!-- Demo slides if no products -->
+                      {% for i in (1..3) %}
+                        <div class="swiper-slide">
+                          <div class="kpr-section2__slide-content">
+                            
+                            <!-- Thumbnails Column -->
+                            <div class="kpr-section2__thumbnails">
+                              <div class="kpr-thumbnails__container">
+                                <div class="kpr-thumbnail__placeholder">
+                                  <span>Thumbnail {{ i }}</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <!-- Product Column -->
+                            <div class="kpr-section2__product">
+                              <div class="kpr-product2__container">
+                                <div class="kpr-product2__image">
+                                  <div class="kpr-product2__placeholder">
+                                    <span>Product {{ i }}</span>
+                                  </div>
+                                </div>
+                                <div class="kpr-product2__info">
+                                  <h3 class="kpr-product2__title">KYPER POOL CUE {{ i }}</h3>
+                                  <div class="kpr-product2__price">
+                                    <span class="kpr-price--regular">${{ 200 | times: i }}</span>
+                                  </div>
+                                  <div class="kpr-product2__actions">
+                                    <button class="kpr-product2__btn" disabled>
+                                      Add to Cart
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <!-- Features Column -->
+                            <div class="kpr-section2__features">
+                              <div class="kpr-features__container">
+                                <h4 class="kpr-features__title">Product Features</h4>
+                                <ul class="kpr-features__list">
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Premium materials for durability</span>
+                                  </li>
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Precision engineering for accuracy</span>
+                                  </li>
+                                  <li class="kpr-feature__item">
+                                    <span class="kpr-feature__icon">✓</span>
+                                    <span class="kpr-feature__text">Ergonomic design for comfort</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                            
+                          </div>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Navigation -->
+                  <div class="swiper-button-next kpr-section2-next"></div>
+                  <div class="swiper-button-prev kpr-section2-prev"></div>
+                  
+                  <!-- Pagination -->
+                  <div class="swiper-pagination kpr-section2-pagination"></div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
           <div class="kpr-section kpr-section--3">Section 3: Demo</div>
         </div>
       </div>
@@ -221,8 +682,10 @@
 </section>
 
 <!-- Add Swiper JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.4.7/swiper-bundle.min.js"></script>
-{{ 'kpr-traditional.js' | asset_url | script_tag }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.4.7/swiper-bundle.min.js" defer></script>
+<script src="{{ 'kpr-traditional.js' | asset_url }}" defer></script>
+<script src="{{ 'seamless-scroll.js' | asset_url }}" defer></script>
+
 
 {% schema %}
 {
@@ -291,6 +754,53 @@
       "type": "collection",
       "id": "section1_collection",
       "label": "Products Collection"
+    },
+    {
+      "type": "header",
+      "content": "Slider Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_autoplay",
+      "label": "Enable Autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_delay",
+      "label": "Autoplay Delay (seconds)",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Section 2: Vertical Showcase"
+    },
+    {
+      "type": "collection",
+      "id": "section2_collection",
+      "label": "Section 2 Products Collection"
+    },
+    {
+      "type": "header",
+      "content": "Reviews Settings"
+    },
+    {
+      "type": "textarea",
+      "id": "reviews_json",
+      "label": "Reviews JSON",
+      "info": "Enter reviews in JSON format: [{\"rating\": 5, \"text\": \"Great product!\", \"author\": \"John D.\", \"verified\": true}]"
+    },
+    {
+      "type": "range",
+      "id": "reviews_speed",
+      "label": "Reviews Scroll Speed",
+      "min": 20,
+      "max": 100,
+      "step": 10,
+      "default": 40
     }
   ],
   "presets": [
