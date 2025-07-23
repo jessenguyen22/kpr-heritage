@@ -94,7 +94,7 @@ class KPRTraditional {
         this.section2Swiper = new Swiper(section2SwiperContainer, {
           slidesPerView: 1,
           spaceBetween: 0,
-          loop: true,
+          loop: false, // Disable loop to avoid index confusion
           navigation: {
             nextEl: '.kpr-section2-next',
             prevEl: '.kpr-section2-prev',
@@ -105,7 +105,15 @@ class KPRTraditional {
           },
           effect: 'slide',
           speed: 600,
+          on: {
+            slideChange: (swiper) => {
+              this.updateThumbnailNavigation(swiper.activeIndex);
+            }
+          }
         });
+
+        // Initialize thumbnail navigation
+        this.initThumbnailNavigation();
 
         console.log('Section 2 Swiper initialized');
       }
@@ -149,8 +157,107 @@ class KPRTraditional {
       }
     }
   
+    // Initialize thumbnail navigation functionality
+    initThumbnailNavigation() {
+      console.log('=== initThumbnailNavigation called ===');
+      
+      // Debug: Check container
+      console.log('Container:', this.container);
+      
+      // Check if swiper is ready
+      console.log('Section2Swiper:', this.section2Swiper);
+      
+      // Wait a bit for DOM to be fully ready
+      setTimeout(() => {
+        console.log('=== Delayed thumbnail init ===');
+        
+        // Get all thumbnail items
+        const allThumbnailItems = this.container.querySelectorAll('.kpr-thumbnail-nav-item');
+        console.log('Found total thumbnail items:', allThumbnailItems.length);
+        
+        if (allThumbnailItems.length > 0) {
+          // Hide default navigation and pagination
+          const section2Slider = this.container.querySelector('.kpr-section2-slider');
+          if (section2Slider) {
+            section2Slider.classList.add('kpr-use-thumbnail-nav');
+            console.log('Added kpr-use-thumbnail-nav class');
+          }
+          
+          // Add event listeners
+          allThumbnailItems.forEach((item, globalIndex) => {
+            const slideIndex = parseInt(item.dataset.slideIndex);
+            console.log(`Thumbnail ${globalIndex}: slideIndex = ${slideIndex}, element:`, item);
+            
+            // Test if element is clickable
+            const rect = item.getBoundingClientRect();
+            console.log(`Thumbnail ${globalIndex} position:`, rect);
+            
+            item.addEventListener('click', (e) => {
+              console.log('=== THUMBNAIL CLICKED ===');
+              console.log('Event:', e);
+              console.log('Target:', e.target);
+              console.log('Current target:', e.currentTarget);
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Going to slide:', slideIndex);
+              this.goToSlide(slideIndex);
+            });
+            
+            // Also add mousedown for testing
+            item.addEventListener('mousedown', (e) => {
+              console.log('MOUSEDOWN on thumbnail:', globalIndex);
+            });
+          });
+          
+          // Set initial active state
+          this.updateThumbnailNavigation(0);
+          
+          console.log('Thumbnail navigation setup complete');
+        } else {
+          console.log('No thumbnail items found!');
+        }
+      }, 100);
+    }
+    
+    // Navigate to specific slide
+    goToSlide(slideIndex) {
+      if (this.section2Swiper) {
+        // Use slideTo instead of slideToLoop for better control
+        this.section2Swiper.slideTo(slideIndex);
+        console.log('Navigate to slide:', slideIndex);
+      }
+    }
+    
+    // Update thumbnail navigation active states
+    updateThumbnailNavigation(activeIndex) {
+      // Update active state on all slides' thumbnail navigation
+      const allSlides = this.container.querySelectorAll('.swiper-slide');
+      
+      allSlides.forEach(slide => {
+        const thumbnailNavItems = slide.querySelectorAll('.kpr-thumbnail-nav-item');
+        
+        thumbnailNavItems.forEach((item, index) => {
+          if (index === activeIndex) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      });
+      
+      console.log('Updated thumbnail navigation, active slide:', activeIndex);
+    }
+
     // Cleanup method
     destroy() {
+      // Remove thumbnail event listeners if any
+      const allThumbnailItems = this.container.querySelectorAll('.kpr-thumbnail-nav-item');
+      allThumbnailItems.forEach(item => {
+        // Clone and replace to remove all event listeners
+        const newItem = item.cloneNode(true);
+        item.parentNode.replaceChild(newItem, item);
+      });
+      
       if (this.swiper) {
         this.swiper.destroy(true, true);
       }

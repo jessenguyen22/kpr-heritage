@@ -624,7 +624,109 @@
   display: flex;
 }
 
-/* Thumbnails Column */
+/* Combined Thumbnails Navigation Column */
+.kpr-section2__thumbnails-nav {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  position: relative;
+}
+
+.kpr-thumbnails-nav__container {
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.kpr-thumbnails-nav__title {
+  margin-bottom: 16px;
+}
+
+.kpr-thumbnails-nav__title h5 {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.kpr-thumbnails-nav__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.kpr-thumbnail-nav-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kpr-thumbnail-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.kpr-thumbnail-nav-item.active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+}
+
+.kpr-thumbnail-nav__image,
+.kpr-thumbnail-nav__video {
+  width: 40px;
+  height: 50px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.kpr-thumbnail-nav__placeholder {
+  width: 40px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.kpr-thumbnail-nav__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpr-thumbnail-nav__title {
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.kpr-thumbnail-nav__price {
+  color: #ff4444;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Legacy Thumbnails Column - Keep for fallback */
 .kpr-thumbnails__container {
   display: flex;
   flex-direction: column;
@@ -826,6 +928,13 @@
 
 .kpr-section2-pagination .swiper-pagination-bullet-active {
   background: white !important;
+}
+
+/* Hide navigation and pagination when using thumbnail navigation */
+.kpr-section2-slider.kpr-use-thumbnail-nav .kpr-section2-next,
+.kpr-section2-slider.kpr-use-thumbnail-nav .kpr-section2-prev,
+.kpr-section2-slider.kpr-use-thumbnail-nav .kpr-section2-pagination {
+  display: none !important;
 }
 
 /* Column Specific Colors for Testing */

@@ -383,47 +383,68 @@
                         <div class="swiper-slide">
                           <div class="kpr-section2__slide-content">
                             
-                            <!-- Thumbnails Column -->
-                            <div class="kpr-section2__thumbnails">
-                              <div class="kpr-thumbnails__container">
-                                {% if product.metafields.kpr.product_thumbnail_vertical != blank
-                                  and product.metafields.kpr.product_thumbnail_vertical.type == 'file_reference'
-                                %}
-                                  {% assign thumbnail_media = product.metafields.kpr.product_thumbnail_vertical %}
-                                  {% assign file_url = thumbnail_media | file_url %}
-                                  
-                                  {% if file_url contains '.mp4'
-                                    or file_url contains '.webm'
-                                    or file_url contains '.mov'
-                                  %}
-                                    <!-- Video Thumbnail -->
-                                    <video
-                                      class="kpr-thumbnail__video"
-                                      playsinline
-                                      muted
-                                      preload="none"
-                                      width="200"
-                                      height="250"
-                                    >
-                                      <source src="{{ file_url }}" type="video/mp4">
-                                    </video>
-                                  {% else %}
-                                    <!-- Image Thumbnail -->
-                                    <img
-                                      src="{{ thumbnail_media | img_url: '200x250' }}"
-                                      alt="{{ product.title | escape }}"
-                                      loading="lazy"
-                                      width="200"
-                                      height="250"
-                                      class="kpr-thumbnail__image"
-                                    >
-                                  {% endif %}
-                                {% else %}
-                                  <!-- Fallback Thumbnail -->
-                                  <div class="kpr-thumbnail__placeholder">
-                                    <span>{{ product.title | default: 'Product Image' }}</span>
-                                  </div>
-                                {% endif %}
+                            <!-- Combined Thumbnails Navigation Column -->
+                            <div class="kpr-section2__thumbnails-nav">
+                              <div class="kpr-thumbnails-nav__container">
+                                <div class="kpr-thumbnails-nav__title">
+                                  <h5>All Products</h5>
+                                </div>
+                                <div class="kpr-thumbnails-nav__list">
+                                  {% for nav_product in collection.products limit: 6 %}
+                                    <div class="kpr-thumbnail-nav-item{% if nav_product.id == product.id %} active{% endif %}" 
+                                         data-slide-index="{{ forloop.index0 }}" 
+                                         data-product-id="{{ nav_product.id }}">
+                                      {% if nav_product.metafields.kpr.product_thumbnail_vertical != blank
+                                        and nav_product.metafields.kpr.product_thumbnail_vertical.type == 'file_reference'
+                                      %}
+                                        {% assign nav_thumbnail_media = nav_product.metafields.kpr.product_thumbnail_vertical %}
+                                        {% assign nav_file_url = nav_thumbnail_media | file_url %}
+                                        
+                                        {% if nav_file_url contains '.mp4'
+                                          or nav_file_url contains '.webm'
+                                          or nav_file_url contains '.mov'
+                                        %}
+                                          <!-- Video Thumbnail -->
+                                          <video
+                                            class="kpr-thumbnail-nav__video"
+                                            playsinline
+                                            muted
+                                            preload="none"
+                                            width="80"
+                                            height="100"
+                                          >
+                                            <source src="{{ nav_file_url }}" type="video/mp4">
+                                          </video>
+                                        {% else %}
+                                          <!-- Image Thumbnail -->
+                                          <img
+                                            src="{{ nav_thumbnail_media | img_url: '80x100' }}"
+                                            alt="{{ nav_product.title | escape }}"
+                                            loading="lazy"
+                                            width="80"
+                                            height="100"
+                                            class="kpr-thumbnail-nav__image"
+                                          >
+                                        {% endif %}
+                                      {% else %}
+                                        <!-- Fallback Thumbnail -->
+                                        <div class="kpr-thumbnail-nav__placeholder">
+                                          <span>{{ nav_product.title | truncate: 8 }}</span>
+                                        </div>
+                                      {% endif %}
+                                      <div class="kpr-thumbnail-nav__info">
+                                        <span class="kpr-thumbnail-nav__title">{{ nav_product.title | truncate: 15 }}</span>
+                                        <span class="kpr-thumbnail-nav__price">
+                                          {% if nav_product.compare_at_price > nav_product.price %}
+                                            {{ nav_product.price | money }}
+                                          {% else %}
+                                            {{ nav_product.price | money }}
+                                          {% endif %}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  {% endfor %}
+                                </div>
                               </div>
                             </div>
                             
@@ -605,11 +626,26 @@
                         <div class="swiper-slide">
                           <div class="kpr-section2__slide-content">
                             
-                            <!-- Thumbnails Column -->
-                            <div class="kpr-section2__thumbnails">
-                              <div class="kpr-thumbnails__container">
-                                <div class="kpr-thumbnail__placeholder">
-                                  <span>Thumbnail {{ i }}</span>
+                            <!-- Combined Thumbnails Navigation Column -->
+                            <div class="kpr-section2__thumbnails-nav">
+                              <div class="kpr-thumbnails-nav__container">
+                                <div class="kpr-thumbnails-nav__title">
+                                  <h5>All Products</h5>
+                                </div>
+                                <div class="kpr-thumbnails-nav__list">
+                                  {% for j in (1..3) %}
+                                    <div class="kpr-thumbnail-nav-item{% if j == i %} active{% endif %}" 
+                                         data-slide-index="{{ forloop.index0 }}" 
+                                         data-product-id="demo-{{ j }}">
+                                      <div class="kpr-thumbnail-nav__placeholder">
+                                        <span>Cue {{ j }}</span>
+                                      </div>
+                                      <div class="kpr-thumbnail-nav__info">
+                                        <span class="kpr-thumbnail-nav__title">KYPER CUE {{ j }}</span>
+                                        <span class="kpr-thumbnail-nav__price">${{ 200 | times: j }}</span>
+                                      </div>
+                                    </div>
+                                  {% endfor %}
                                 </div>
                               </div>
                             </div>
