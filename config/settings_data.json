@@ -10,10 +10,10 @@
 {
   "current": {
     "logo": "shopify://shop_images/logo_kyperus_w.png",
-    "type_body_font": "space_mono_n4",
-    "type_subheading_font": "space_mono_n4",
-    "type_heading_font": "tomorrow_n7",
-    "type_accent_font": "tomorrow_n4",
+    "type_body_font": "chakra_petch_n4",
+    "type_subheading_font": "chakra_petch_n4",
+    "type_heading_font": "chakra_petch_n7",
+    "type_accent_font": "chakra_petch_n4",
     "type_size_paragraph": "14",
     "type_line_height_paragraph": "body-loose",
     "type_font_h1": "secondary",
