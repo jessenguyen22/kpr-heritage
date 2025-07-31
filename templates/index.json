@@ -37,7 +37,12 @@
         "section1_banner_description": "",
         "section1_view_all_text": "",
         "section1_view_all_url": "",
-        "section1_collection": "traditional-collection"
+        "section1_collection": "traditional-collection",
+        "enable_autoplay": true,
+        "autoplay_delay": 5,
+        "section2_collection": "traditional-collection",
+        "reviews_json": "",
+        "reviews_speed": 40
       }
     }
   },
